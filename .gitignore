@@ -1,0 +1,7 @@
+node_modules/
+.idea/
+
+ethereum/build
+ethereum/config/config.js
+
+.next/
