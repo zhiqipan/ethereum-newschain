@@ -4,38 +4,17 @@ import { Link } from '../../routes';
 import Layout from '../../client/components/Layout';
 import RewardForm from '../../client/components/RewardForm';
 import web3 from '../../ethereum/utils/web3';
-import getArticle from '../../ethereum/instances/article';
-import { getFromSwarm } from '../../client/utils/swarm';
 import { PicksContext } from '../../client/context/picks';
-
-function translateSummary(original) {
-  const summaryMap = [
-    'contentHash',
-    'creator',
-    'rewardRecipient',
-    'citations',
-    'citedBy',
-    'rewardValue',
-    'rewardTimes',
-    'tokenTypes',
-  ];
-  const result = {};
-  summaryMap.forEach((name, index) => {
-    result[name] = original[index];
-  });
-  result.contentHash = result.contentHash.replace('0x', '');
-  return result;
-}
+import loadArticleDetail from '../../client/utils/loadArticleDetail';
 
 export default class ArticleDetailPage extends Component {
   static contextType = PicksContext;
 
   static async getInitialProps(props) {
     const { address } = props.query;
-    const summary = translateSummary(await getArticle(address).methods.getSummary().call());
-    const { title, body } = JSON.parse(await getFromSwarm(summary.contentHash));
+    const detail = await loadArticleDetail(address);
 
-    return { address, ...summary, title, body };
+    return { address, ...detail };
   }
 
   renderSummary() {

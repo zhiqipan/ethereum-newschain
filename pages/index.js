@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import { Button, Card } from 'semantic-ui-react';
+import { Button, Card, Dimmer, Loader } from 'semantic-ui-react';
 import factory from '../ethereum/instances/factory';
 import Layout from '../client/components/Layout';
 import { Link } from '../routes';
+import loadArticleDetail from '../client/utils/loadArticleDetail';
+
+const cachedArticles = {};
 
 class HomePage extends Component {
   static async getInitialProps() {
@@ -10,15 +13,35 @@ class HomePage extends Component {
     return { articles };
   }
 
+  state = {
+    articles: {},
+  };
+
   renderArticles() {
     const items = this.props.articles.map(addr => {
+      const article = this.state.articles[addr] || cachedArticles[addr];
+
+      if (!article) {
+        loadArticleDetail(addr).then(detail => {
+          this.setState(state => {
+            state.articles[addr] = detail;
+            cachedArticles[addr] = detail;
+            return { articles: { ...state.articles } };
+          });
+        });
+
+        return {
+          header: addr,
+          meta: <Link route={`/articles/${addr}`}><a>View article</a></Link>,
+          description: <Loader active />,
+          fluid: true,
+        };
+      }
+
       return {
-        header: addr,
-        description: (
-          <Link route={`/articles/${addr}`}>
-            <a>View article</a>
-          </Link>
-        ),
+        header: article.title,
+        meta: <Link route={`/articles/${addr}`}><a>View article</a></Link>,
+        description: <p style={{ marginTop: 10 }}>{article.body}</p>,
         fluid: true,
       };
     });
