@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { Button, Form, Input, Message } from 'semantic-ui-react';
 import { Router } from '../routes';
 import web3 from '../ethereum/utils/web3';
-import getCampaign from '../ethereum/instances/campaign';
+import getArticle from '../ethereum/instances/article';
 
-export default class ContributeForm extends Component {
+export default class RewardForm extends Component {
   static defaultProps = {
     address: null,
   };
@@ -19,10 +19,10 @@ export default class ContributeForm extends Component {
     event.preventDefault();
     this.setState({ transacting: true, errorMessage: null });
     try {
-      const campaign = getCampaign(this.props.address);
+      const campaign = getArticle(this.props.address);
       const value = web3.utils.toWei(this.state.etherAmount.toString());
       const account = (await web3.eth.getAccounts())[0];
-      await campaign.methods.contribute().send({
+      await campaign.methods.reward().send({
         from: account,
         value,
       });
@@ -30,9 +30,7 @@ export default class ContributeForm extends Component {
       console.error(e);
       this.setState({ errorMessage: e.message });
     }
-    // this calls getInitialProps() in CampaignDetailsPage (in browser) to update the props, instead of refreshing the page
-    // getInitialProps() can be called on both server side and client side
-    Router.replaceRoute(`/campaigns/${this.props.address}`);
+    Router.replaceRoute(`/articles/${this.props.address}`);
     this.setState({ transacting: false });
   };
 
@@ -42,7 +40,7 @@ export default class ContributeForm extends Component {
     return (
       <Form error={!!errorMessage} onSubmit={this.onSubmit}>
         <Form.Field>
-          <label>Amount to contribute</label>
+          <label>Amount to reward</label>
           <Input
             label='ether'
             labelPosition='right'
@@ -50,7 +48,7 @@ export default class ContributeForm extends Component {
             onChange={event => this.setState({ etherAmount: event.target.value })}
           />
         </Form.Field>
-        <Button disabled={!this.props.address || transacting} primary loading={transacting}>Create</Button>
+        <Button disabled={!this.props.address || transacting} primary loading={transacting}>Reward</Button>
         <Message error header='Oops...' content={errorMessage} />
       </Form>
     );
