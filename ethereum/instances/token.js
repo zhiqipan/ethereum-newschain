@@ -4,7 +4,7 @@ import compiledToken from '../build/NcToken';
 import address from '../config/token.address';
 
 const instance = new web3.eth.Contract(
-  JSON.parse(compiledToken.interface),
+  compiledToken.abi,
   address,
 );
 

@@ -4,7 +4,7 @@ import compiledFactory from '../build/ArticleFactory';
 import address from '../config/factory.address';
 
 const instance = new web3.eth.Contract(
-  JSON.parse(compiledFactory.interface),
+  compiledFactory.abi,
   address,
 );
 

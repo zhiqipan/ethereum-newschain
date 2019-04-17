@@ -3,7 +3,7 @@ import compiledArticle from '../build/Article';
 
 function getInstance(address) {
   return new web3.eth.Contract(
-    JSON.parse(compiledArticle.interface),
+    compiledArticle.abi,
     address,
   );
 }
