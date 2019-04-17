@@ -5,7 +5,7 @@ import { Link } from '../../routes';
 export default class Header extends Component {
   render() {
     return (
-      <Menu style={{ marginTop: 10 }}>
+      <Menu>
         <Link route='/'>
           <a className='item'>NewsChain</a>
         </Link>
