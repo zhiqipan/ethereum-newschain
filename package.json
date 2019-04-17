@@ -5,6 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "node server.js",
+    "sm:compile": "node ethereum/scripts/compile.js",
+    "sm:deploy": "node ethereum/scripts/deploy.js",
     "test": "jest"
   },
   "dependencies": {

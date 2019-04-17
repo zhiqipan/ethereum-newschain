@@ -3,5 +3,6 @@ node_modules/
 
 ethereum/build
 ethereum/config/config.js
+ethereum/config/*.address.json
 
 .next/

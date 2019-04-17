@@ -1,7 +1,7 @@
 import web3 from '../utils/web3';
-import compiledFactory from '../build/CampaignFactory';
+import compiledFactory from '../build/ArticleFactory';
 
-const address = '0xE5bE149d0cEa64016c488F0e017CE908C936DA64';
+import address from '../config/factory.address';
 
 const instance = new web3.eth.Contract(
   JSON.parse(compiledFactory.interface),

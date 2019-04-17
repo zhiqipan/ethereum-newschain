@@ -1,25 +1,46 @@
+const fs = require('fs-extra');
+const path = require('path');
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const Web3 = require('web3');
 const { mnemonic, rinkebyAddress } = require('../config/config');
-const compiledFactory = require('../build/CampaignFactory'); // assumes compilation has been done already
 
 // rinkebyAddress is the address of Infura rinkeby network endpoint, use Infura so we don't have to host node on our local machine (which is expensive)
 // mnemonic gives information of our accounts (public key and private key) so web3 can take control of our account
 const provider = new HDWalletProvider(mnemonic, rinkebyAddress);
 const eth = new Web3(provider).eth;
 
-async function deploy(...arguments) {
+async function deploy(abi, bytecode, arguments = []) {
   console.info('Retrieving accounts');
   const accounts = await eth.getAccounts();
   console.info('Attempting to deploy from account', accounts[0]);
-  const result = await new eth.Contract(JSON.parse(compiledFactory.interface))
-    .deploy({ data: '0x' + compiledFactory.bytecode, arguments })
+  const result = await new eth.Contract(JSON.parse(abi))
+    .deploy({ data: '0x' + bytecode, arguments })
     .send({ from: accounts[0] });
   console.info('Contract deployed to', result.options.address);
-  console.info('Contract interface:\n' + compiledFactory.interface);
+  console.info('Contract interface:\n' + abi);
   console.info('More information:', `https://rinkeby.etherscan.io/address/${result.options.address}`);
+  return result.options.address;
 }
 
-deploy().catch(e => {
-  console.error('Failed to deploy\n' + e);
+// assumes compilation has been done already
+const compiledToken = require('../build/NcToken');
+const compiledFactory = require('../build/ArticleFactory');
+
+async function run() {
+  const tokenAddress = await deploy(compiledToken.interface, compiledToken.bytecode);
+  const factoryAddress = await deploy(compiledFactory.interface, compiledFactory.bytecode, [false, 0, 0, tokenAddress]);  // (bool enableReward, uint citationCap, uint amount, address rewardFrom)
+
+  const tokenPath = path.resolve(__dirname, '..', 'config', 'token.address.json');
+  const factoryPath = path.resolve(__dirname, '..', 'config', 'factory.address.json');
+  fs.writeFileSync(tokenPath, `"${tokenAddress}"`);
+  fs.writeFileSync(factoryPath, `"${factoryAddress}"`);
+
+  return { tokenAddress, factoryAddress };
+}
+
+run().then(addresses => {
+  console.info('\n\nDeployment completed');
+  console.info(addresses);
+}).catch(e => {
+  console.error('Failed to deploy', e);
 });
