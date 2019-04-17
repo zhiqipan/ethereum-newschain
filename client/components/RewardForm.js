@@ -7,12 +7,14 @@ import getArticle from '../../ethereum/instances/article';
 export default class RewardForm extends Component {
   static defaultProps = {
     address: null,
+    rewardRecipient: null,
   };
 
   state = {
     etherAmount: 0.1,
     transacting: false,
     errorMessage: null,
+    showSuccessMessage: false,
   };
 
   onSubmit = async event => {
@@ -26,6 +28,11 @@ export default class RewardForm extends Component {
         from: account,
         value,
       });
+      if (process.browser) {
+        this.setState({ showSuccessMessage: true }, () => {
+          setTimeout(() => this.setState({ showSuccessMessage: false }), 3000);
+        });
+      }
     } catch (e) {
       console.error(e);
       this.setState({ errorMessage: e.message });
@@ -35,7 +42,7 @@ export default class RewardForm extends Component {
   };
 
   render() {
-    const { etherAmount, transacting, errorMessage } = this.state;
+    const { etherAmount, transacting, errorMessage, showSuccessMessage } = this.state;
 
     return (
       <Form error={!!errorMessage} onSubmit={this.onSubmit}>
@@ -48,8 +55,20 @@ export default class RewardForm extends Component {
             onChange={event => this.setState({ etherAmount: event.target.value })}
           />
         </Form.Field>
-        <Button disabled={!this.props.address || transacting} primary loading={transacting}>Reward</Button>
+        <Button
+          primary
+          loading={transacting}
+          disabled={!this.props.address || transacting}
+          content='Reward'
+        />
+        <Message hidden={!transacting}>
+          <Message.Header>
+            Your donation is sending to
+          </Message.Header>
+          <p style={{ fontFamily: 'monospace' }}>{this.props.rewardRecipient}</p>
+        </Message>
         <Message error header='Oops...' content={errorMessage} />
+        <Message positive hidden={!showSuccessMessage} header='Successful' content='Thank you for your support' />
       </Form>
     );
   }

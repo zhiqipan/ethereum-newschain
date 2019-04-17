@@ -31,7 +31,7 @@ export default class Article extends Component {
                 <Icon size='large' color='grey' name='ethereum' />
                 Etherscan
               </Menu.Item>
-              {!window || window.location.pathname.replace(/\/$/, '') !== `/articles/${address}/history` &&
+              {(typeof window !== 'object' || window.location.pathname.replace(/\/$/, '') !== `/articles/${address}/history`) &&
               <Menu.Item href={`/articles/${address}/history`}>
                 <Icon size='large' color='grey' name='history' />
                 History

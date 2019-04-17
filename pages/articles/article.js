@@ -19,19 +19,9 @@ export default class ArticleDetailPage extends Component {
   }
 
   renderSummary() {
-    const { creator, rewardRecipient, citations, citedBy, rewardValue, rewardTimes, tokenTypes } = this.props;
+    const { citations, citedBy, rewardValue, rewardTimes, tokenTypes } = this.props;
 
     const items = [{
-      header: creator,
-      meta: 'Address of creator',
-      description: 'This address created and published this article',
-      style: { overflowWrap: 'break-word' },
-    }, {
-      header: rewardRecipient,
-      meta: 'Address of reward recipient',
-      description: 'This is the recipient of all rewards on this article',
-      style: { overflowWrap: 'break-word' },
-    }, {
       header: `Refers to ${citations.length} article(s)`,
       meta: 'Number of citations of this article',
       description: 'How many other articles the author refers to / gets inspiration from',
@@ -49,11 +39,11 @@ export default class ArticleDetailPage extends Component {
       description: `This article has been rewarded by tokens`,
     }];
 
-    return <Card.Group itemsPerRow={3} items={items} />;
+    return <Card.Group itemsPerRow={4} items={items} />;
   }
 
   render() {
-    const { address, contentHash, title, body, citations, citedBy, rewardValue, version } = this.props;
+    const { address, contentHash, title, body, citations, citedBy, rewardValue, version, creator, rewardRecipient } = this.props;
     const picked = this.context.articles[address];
     const payload = {
       contentHash,
@@ -72,7 +62,11 @@ export default class ArticleDetailPage extends Component {
               <h1>Article</h1>
               <div>
                 <Label style={{ margin: 0, marginBottom: 10 }}>
-                  <Icon name='ethereum' style={{ width: 11 }} />Ethereum address
+                  <Icon name='copyright' style={{ width: 11 }} />Creator address
+                  <Label.Detail style={{ fontFamily: 'monospace' }}>{creator}</Label.Detail>
+                </Label>
+                <Label style={{ margin: 0, marginBottom: 10 }}>
+                  <Icon name='ethereum' style={{ width: 11 }} />Contract address
                   <Label.Detail style={{ fontFamily: 'monospace' }}>{address}</Label.Detail>
                 </Label>
                 <Label style={{ margin: 0, marginBottom: 10 }}>
@@ -82,7 +76,7 @@ export default class ArticleDetailPage extends Component {
               </div>
             </Grid.Column>
             <Grid.Column width={6}>
-              <RewardForm address={address} />
+              <RewardForm address={address} rewardRecipient={rewardRecipient} />
             </Grid.Column>
           </Grid.Row>
           <Divider />
