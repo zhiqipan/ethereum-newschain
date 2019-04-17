@@ -5,6 +5,11 @@ import web3 from '../../ethereum/utils/web3';
 import { Router, Link } from '../../routes';
 import { getFromSwarm, putToSwarm } from '../../client/utils/swarm';
 import getArticle from '../../ethereum/instances/article';
+import dynamic from 'next/dynamic';
+
+const MarkdownEditor = process.browser ? dynamic(() => {
+  return import('../../client/components/MarkdownEditor' /* webpackChunkName: 'MarkdownEditor' */);
+}) : () => null;
 
 export default class ArticleModifyPage extends Component {
   static getInitialProps(props) {
@@ -15,6 +20,7 @@ export default class ArticleModifyPage extends Component {
   static defaultProps = {
     address: '',
     contentHash: '',
+    disabled: false,
   };
 
   state = {
@@ -68,7 +74,7 @@ export default class ArticleModifyPage extends Component {
           </Form.Field>
           <Form.Field>
             <label>Body</label>
-            <TextArea disabled={!isCreator} value={body} onChange={event => this.setState({ body: event.target.value })} rows={12} style={{ minHeight: 100 }} />
+            <MarkdownEditor disabled={!isCreator} onChange={html => this.setState({ body: html })} initialHtml={body} />
           </Form.Field>
           {isCreator === true &&
           <React.Fragment>

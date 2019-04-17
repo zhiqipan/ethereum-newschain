@@ -4,6 +4,7 @@ import factory from '../ethereum/instances/factory';
 import Layout from '../client/components/Layout';
 import { Link } from '../routes';
 import loadArticleDetail from '../client/utils/loadArticleDetail';
+import HtmlViewer from '../client/components/HtmlViewer';
 
 const cachedArticles = {};
 
@@ -41,7 +42,7 @@ class HomePage extends Component {
       return {
         header: article.title,
         meta: <Link route={`/articles/${addr}`}><a>View article</a></Link>,
-        description: <p style={{ marginTop: 10 }}>{article.body}</p>,
+        description: <HtmlViewer html={article.body.replace(/<img[^>]*>/g, '')} style={styles.bodyAbstract} />,
         fluid: true,
       };
     });
@@ -71,3 +72,13 @@ class HomePage extends Component {
 }
 
 export default HomePage;
+
+const styles = {
+  bodyAbstract: {
+    marginTop: 10,
+    overflowWrap: 'break-word',
+    maxHeight: 192,
+    lineHeight: '24px',
+    overflowY: 'hidden',
+  },
+};

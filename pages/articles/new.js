@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
-import { Button, Card, Form, Input, TextArea, Message, Divider, Label, Icon, Grid } from 'semantic-ui-react';
+import dynamic from 'next/dynamic';
+import { Button, Card, Form, Input, TextArea, Message, Divider, Label, Icon } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
 import web3 from '../../ethereum/utils/web3';
 import factory from '../../ethereum/instances/factory';
 import { Router, Link } from '../../routes';
 import { putToSwarm } from '../../client/utils/swarm';
 import { PicksContext } from '../../client/context/picks';
+
+const MarkdownEditor = process.browser ? dynamic(() => {
+  return import('../../client/components/MarkdownEditor' /* webpackChunkName: 'MarkdownEditor' */);
+}) : () => null;
 
 export default class ArticleNewPage extends Component {
   static contextType = PicksContext;
@@ -103,7 +108,7 @@ export default class ArticleNewPage extends Component {
           </Form.Field>
           <Form.Field>
             <label>Body</label>
-            <TextArea value={body} onChange={event => this.setState({ body: event.target.value })} rows={12} style={{ minHeight: 100 }} />
+            <MarkdownEditor onChange={html => this.setState({ body: html })} initialHtml={body} />
           </Form.Field>
           <Button disabled={transacting} primary loading={transacting}>Create</Button>
           <Message error header='Oops...' content={errorMessage} />
