@@ -6,6 +6,7 @@ import RewardForm from '../../client/components/RewardForm';
 import web3 from '../../ethereum/utils/web3';
 import { PicksContext } from '../../client/context/picks';
 import loadArticleDetail from '../../client/utils/loadArticleDetail';
+import Article from '../../client/components/Article';
 
 export default class ArticleDetailPage extends Component {
   static contextType = PicksContext;
@@ -51,41 +52,8 @@ export default class ArticleDetailPage extends Component {
     return <Card.Group itemsPerRow={3} items={items} />;
   }
 
-  renderContent() {
-    const { address, contentHash, title, body } = this.props;
-    const version = parseInt(this.props.version);
-    const { Row, Column } = Grid;
-    return (
-      <Grid columns='equal'>
-        <Row>
-          <Column>
-            <h2>{title}</h2>
-            <Label color='purple'>{version === 0 ? 'Initial version' : `Modified | Version: ${version + 1}`}</Label>
-          </Column>
-          <Column textAlign='right'>
-            <Menu compact borderless secondary icon='labeled'>
-              <Menu.Item target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>
-                <Icon size='large' color='grey' name='linkify' />
-                Permalink
-              </Menu.Item>
-              <Menu.Item target='_blank' href={`https://rinkeby.etherscan.io/address/${address}`}>
-                <Icon size='large' color='grey' name='ethereum' />
-                Etherscan
-              </Menu.Item>
-              <Menu.Item href={`/articles/${address}/history`}>
-                <Icon size='large' color='grey' name='history' />
-                History
-              </Menu.Item>
-            </Menu>
-          </Column>
-        </Row>
-        <Row><Column>{body}</Column></Row>
-      </Grid>
-    );
-  }
-
   render() {
-    const { address, contentHash, title, body, citations, citedBy, rewardValue } = this.props;
+    const { address, contentHash, title, body, citations, citedBy, rewardValue, version } = this.props;
     const picked = this.context.articles[address];
     const payload = {
       contentHash,
@@ -125,8 +93,14 @@ export default class ArticleDetailPage extends Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column>
-              <Segment raised style={{ overflowY: 'auto', maxHeight: 580 }}>
-                {this.renderContent()}
+              <Segment raised stacked>
+                <Article
+                  address={address}
+                  contentHash={contentHash}
+                  title={title}
+                  body={body}
+                  version={version}
+                />
               </Segment>
             </Grid.Column>
           </Grid.Row>
