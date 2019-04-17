@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Card, Divider, Grid, Label } from 'semantic-ui-react';
+import { Button, Card, Divider, Grid, Icon, Label, Menu, Segment } from 'semantic-ui-react';
 import { Link } from '../../routes';
 import Layout from '../../client/components/Layout';
 import RewardForm from '../../client/components/RewardForm';
@@ -52,17 +52,35 @@ export default class ArticleDetailPage extends Component {
   }
 
   renderContent() {
-    const { contentHash, title, body } = this.props;
+    const { address, contentHash, title, body } = this.props;
     const version = parseInt(this.props.version);
+    const { Row, Column } = Grid;
     return (
-      <div>
-        <h2>{title}</h2>
-        <Label color='purple'>
-          {version === 0 ? 'Initial version' : `Modified | Version: ${version + 1}`}
-        </Label>
-        <a style={{ marginLeft: 10 }} target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>Publicly available here</a>
-        <p style={{ marginTop: 10 }}>{body}</p>
-      </div>
+      <Grid columns='equal'>
+        <Row>
+          <Column>
+            <h2>{title}</h2>
+            <Label color='purple'>{version === 0 ? 'Initial version' : `Modified | Version: ${version + 1}`}</Label>
+          </Column>
+          <Column textAlign='right'>
+            <Menu compact borderless secondary icon='labeled'>
+              <Menu.Item target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>
+                <Icon size='large' color='grey' name='linkify' />
+                Permalink
+              </Menu.Item>
+              <Menu.Item target='_blank' href={`https://rinkeby.etherscan.io/address/${address}`}>
+                <Icon size='large' color='grey' name='ethereum' />
+                Etherscan
+              </Menu.Item>
+              <Menu.Item href={`/articles/${address}/history`}>
+                <Icon size='large' color='grey' name='history' />
+                History
+              </Menu.Item>
+            </Menu>
+          </Column>
+        </Row>
+        <Row><Column>{body}</Column></Row>
+      </Grid>
     );
   }
 
@@ -84,9 +102,15 @@ export default class ArticleDetailPage extends Component {
           <Grid.Row>
             <Grid.Column width={10}>
               <h1>Article</h1>
-              <div style={{ fontFamily: 'monospace' }}>
-                <p>{address}</p>
-                <p>{contentHash}</p>
+              <div>
+                <Label style={{ margin: 0, marginBottom: 10 }}>
+                  <Icon name='ethereum' style={{ width: 11 }} />Ethereum address
+                  <Label.Detail style={{ fontFamily: 'monospace' }}>{address}</Label.Detail>
+                </Label>
+                <Label style={{ margin: 0, marginBottom: 10 }}>
+                  <Icon name='slack hash' style={{ width: 11 }} />Swarm hash
+                  <Label.Detail style={{ fontFamily: 'monospace' }}>{contentHash}</Label.Detail>
+                </Label>
               </div>
             </Grid.Column>
             <Grid.Column width={6}>
@@ -101,7 +125,9 @@ export default class ArticleDetailPage extends Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column>
-              {this.renderContent()}
+              <Segment raised stacked>
+                {this.renderContent()}
+              </Segment>
             </Grid.Column>
           </Grid.Row>
         </Grid>
