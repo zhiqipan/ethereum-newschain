@@ -40,6 +40,10 @@ contract ArticleFactory {
   function createArticle(bytes32 _contentHash, address payable _rewardRecipient, address[] memory _citations) public {
     address newArticle = address(new Article(_contentHash, msg.sender, _rewardRecipient, _citations));
     deployedArticles.push(newArticle);
+    for (uint i = 0; i < _citations.length; i++) {
+      Article a = Article(_citations[i]);
+      a.addCitedBy(newArticle);
+    }
   }
 
   function getArticles() public view returns (address[] memory) {
@@ -77,8 +81,9 @@ contract Article {
     factoryAddress = msg.sender;
     for (uint i = 0; i < _citations.length; i++) {
       citations.push(_citations[i]);
-      Article a = Article(_citations[i]);
-      a.addCitedBy();
+      // this exceeds block gas limit
+      // Article a = Article(_citations[i]);
+      // a.addCitedBy();
     }
   }
 
@@ -142,10 +147,23 @@ contract Article {
     delete citations[index];
   }
 
-  function addCitedBy() public {
+  function addCitedBy() external {
     Article article = Article(msg.sender);
     require(article.isArticle()); // should be sent from an article
     citedBy.push(msg.sender);
+
+    if (!autoTokenRewarded) {
+      ArticleFactory factory = ArticleFactory(factoryAddress);
+      if (factory.enableAutoTokenReward() && citedBy.length >= factory.autoTokenRewardCitationCap()) {
+        NcToken(factory.autoTokenRewardFrom()).generateAutoRewardToArticle(factory.autoTokenRewardAmount());
+        autoTokenRewarded = true;
+      }
+    }
+  }
+
+  function addCitedBy(address other) external {
+    require(msg.sender == factoryAddress);
+    citedBy.push(other);
 
     if (!autoTokenRewarded) {
       ArticleFactory factory = ArticleFactory(factoryAddress);
