@@ -64,11 +64,11 @@ export default class ArticleModifyPage extends Component {
         <Form error={!!errorMessage} onSubmit={this.onSubmit}>
           <Form.Field>
             <label>Title</label>
-            <Input value={title} onChange={event => this.setState({ title: event.target.value })} />
+            <Input disabled={!isCreator} value={title} onChange={event => this.setState({ title: event.target.value })} />
           </Form.Field>
           <Form.Field>
             <label>Body</label>
-            <TextArea value={body} onChange={event => this.setState({ body: event.target.value })} rows={12} style={{ minHeight: 100 }} />
+            <TextArea disabled={!isCreator} value={body} onChange={event => this.setState({ body: event.target.value })} rows={12} style={{ minHeight: 100 }} />
           </Form.Field>
           {isCreator === true &&
           <React.Fragment>
