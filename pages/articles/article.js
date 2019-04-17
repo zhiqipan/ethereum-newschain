@@ -85,8 +85,16 @@ export default class ArticleDetailPage extends Component {
   }
 
   render() {
-    const { address, contentHash } = this.props;
+    const { address, contentHash, title, body, citations, citedBy, rewardValue } = this.props;
     const picked = this.context.articles[address];
+    const payload = {
+      contentHash,
+      title,
+      body,
+      citations,
+      citedBy,
+      rewardValueEther: web3.utils.fromWei(rewardValue.toString(), 'ether'),
+    };
 
     return (
       <Layout>
@@ -117,7 +125,7 @@ export default class ArticleDetailPage extends Component {
         </Grid>
         <Divider />
         {!picked &&
-        <Button primary content='Pick to cite' onClick={() => this.context.pick(address, { contentHash })} />
+        <Button primary content='Pick to cite' onClick={() => this.context.pick(address, payload)} />
         }
         {picked &&
         <Button negative content='Unpick' onClick={() => this.context.unpick(address)} />

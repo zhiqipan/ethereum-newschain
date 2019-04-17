@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Card, Form, Input, TextArea, Message, Divider } from 'semantic-ui-react';
+import { Button, Card, Form, Input, TextArea, Message, Divider, Label, Icon, Grid } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
 import web3 from '../../ethereum/utils/web3';
 import factory from '../../ethereum/instances/factory';
@@ -31,6 +31,7 @@ export default class ArticleNewPage extends Component {
         from: account,
       });
       console.info('Article confirmed on Ethereum:', `block #${result.blockNumber}, transaction ${result.transactionHash}`);
+      this.context.unpickAll();
       Router.push('/');
     } catch (e) {
       console.error(e);
@@ -42,20 +43,52 @@ export default class ArticleNewPage extends Component {
   renderPickedArticles() {
     const { articles } = this.context;
 
+    if (Object.keys(articles).length === 0) return <p>No citation</p>;
+
     const items = Object.keys(articles).map(addr => {
+      const { contentHash, title, body, citations = [], citedBy = [], rewardValueEther } = articles[addr];
       return {
-        header: addr,
-        meta: articles[addr].contentHash,
+        header: title,
+        meta: addr,
         description: (
-          <Link route={`/articles/${addr}`}>
-            <a>View article</a>
-          </Link>
+          <div>
+            <div style={{ margin: '10px 0' }}>
+              <Label color='blue'>
+                <Icon name='list' />
+                {citations.length.toString()} citations
+              </Label>
+              <Label color='teal'>
+                <Icon name='code branch' />
+                <span>cited by {citedBy.length.toString()} articles</span>
+              </Label>
+              <Label color='yellow'>
+                <Icon name='ethereum' />
+                <span>{rewardValueEther.toString()} ether reward</span>
+              </Label>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <p style={{ height: 60 }}>{body.substr(0, 200)}{body.length > 200 && '...'}</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div>
+                  <Link route={`/articles/${addr}`}><a>View article</a></Link>
+                  <p><a target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>Permalink</a></p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                  <a style={this.state.transacting ? { color: 'lightgray', cursor: 'default' } : {}} onClick={() => {
+                    if (this.state.transacting) return;
+                    this.context.unpick(addr);
+                  }}>Unpick</a>
+                </div>
+              </div>
+            </div>
+          </div>
         ),
-        fluid: true,
+        fluid: false,
+        style: { overflowWrap: 'break-word' },
       };
     });
 
-    return <Card.Group items={items} />;
+    return <Card.Group itemsPerRow={2} items={items} />;
   }
 
   render() {

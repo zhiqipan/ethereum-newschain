@@ -17,10 +17,17 @@ export default class MyApp extends App {
     });
   };
 
+  unpickAll = () => {
+    this.setState(state => {
+      return { articles: {} };
+    });
+  };
+
   state = {
     articles: {},
     pick: this.pick,
     unpick: this.unpick,
+    unpickAll: this.unpickAll,
   };
 
   render() {
