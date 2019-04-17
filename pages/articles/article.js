@@ -6,6 +6,7 @@ import RewardForm from '../../client/components/RewardForm';
 import web3 from '../../ethereum/utils/web3';
 import getArticle from '../../ethereum/instances/article';
 import { getFromSwarm } from '../../client/utils/swarm';
+import { PicksContext } from '../../client/context/picks';
 
 function translateSummary(original) {
   const summaryMap = [
@@ -27,6 +28,8 @@ function translateSummary(original) {
 }
 
 export default class ArticleDetailPage extends Component {
+  static contextType = PicksContext;
+
   static async getInitialProps(props) {
     const { address } = props.query;
     const summary = translateSummary(await getArticle(address).methods.getSummary().call());
@@ -83,6 +86,8 @@ export default class ArticleDetailPage extends Component {
 
   render() {
     const { address, contentHash } = this.props;
+    const { articles: pickedArticles } = this.context;
+
     return (
       <Layout>
         <Grid>
@@ -110,6 +115,13 @@ export default class ArticleDetailPage extends Component {
             </Grid.Column>
           </Grid.Row>
         </Grid>
+        <Divider />
+        {!pickedArticles.includes(address) &&
+        <Button primary content='Pick to cite' onClick={() => this.context.pick(address)} />
+        }
+        {pickedArticles.includes(address) &&
+        <Button negative content='Unpick' onClick={() => this.context.unpick(address)} />
+        }
       </Layout>
     );
   }

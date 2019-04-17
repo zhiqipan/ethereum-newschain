@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
-import { Button, Form, Input, TextArea, Message } from 'semantic-ui-react';
+import { Button, Card, Form, Input, TextArea, Message, Divider } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
 import web3 from '../../ethereum/utils/web3';
 import factory from '../../ethereum/instances/factory';
-import { Router } from '../../routes';
+import getArticle from '../../ethereum/instances/article';
+import { Router, Link } from '../../routes';
 import { putToSwarm } from '../../client/utils/swarm';
+import { PicksContext } from '../../client/context/picks';
 
 export default class ArticleNewPage extends Component {
+  static contextType = PicksContext;
+
   state = {
     title: '',
     body: '',
@@ -35,6 +39,27 @@ export default class ArticleNewPage extends Component {
     this.setState({ transacting: false });
   };
 
+  renderPickedArticles() {
+    const { articles } = this.context;
+
+    console.log(this.context);
+
+    const items = articles.map(addr => {
+      console.log(addr);
+      return {
+        header: addr,
+        description: (
+          <Link route={`/articles/${addr}`}>
+            <a>View article</a>
+          </Link>
+        ),
+        fluid: true,
+      };
+    });
+
+    return <Card.Group items={items} />;
+  }
+
   render() {
     const { title, body, transacting, errorMessage } = this.state;
     return (
@@ -47,11 +72,14 @@ export default class ArticleNewPage extends Component {
           </Form.Field>
           <Form.Field>
             <label>Body</label>
-            <TextArea value={body} onChange={event => this.setState({ body: event.target.value })} />
+            <TextArea value={body} onChange={event => this.setState({ body: event.target.value })} rows={12} style={{ minHeight: 100 }} />
           </Form.Field>
           <Button disabled={transacting} primary loading={transacting}>Create</Button>
           <Message error header='Oops...' content={errorMessage} />
         </Form>
+        <Divider />
+        <h3>Citations:</h3>
+        {this.renderPickedArticles()}
       </Layout>
     );
   }
