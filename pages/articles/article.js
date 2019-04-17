@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Card, Divider, Grid } from 'semantic-ui-react';
+import { Button, Card, Divider, Grid, Label } from 'semantic-ui-react';
 import { Link } from '../../routes';
 import Layout from '../../client/components/Layout';
 import RewardForm from '../../client/components/RewardForm';
@@ -53,12 +53,15 @@ export default class ArticleDetailPage extends Component {
 
   renderContent() {
     const { contentHash, title, body } = this.props;
-
+    const version = parseInt(this.props.version);
     return (
       <div>
         <h2>{title}</h2>
-        <p><a href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>Publicly available here</a></p>
-        <p>{body}</p>
+        <Label color='purple'>
+          {version === 0 ? 'Initial version' : `Modified | Version: ${version + 1}`}
+        </Label>
+        <a style={{ marginLeft: 10 }} target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>Publicly available here</a>
+        <p style={{ marginTop: 10 }}>{body}</p>
       </div>
     );
   }
@@ -109,6 +112,7 @@ export default class ArticleDetailPage extends Component {
         {picked &&
         <Button negative content='Unpick' onClick={() => this.context.unpick(address)} />
         }
+        <Link route={`/articles/${address}/modify?hash=${contentHash}`}><Button content='Modify' /></Link>
       </Layout>
     );
   }

@@ -4,6 +4,7 @@ import { getFromSwarm } from './swarm';
 function translateSummary(original) {
   const summaryMap = [
     'contentHash',
+    'version',
     'creator',
     'rewardRecipient',
     'citations',

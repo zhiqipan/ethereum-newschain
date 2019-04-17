@@ -57,6 +57,9 @@ contract ArticleFactory {
  **/
 contract Article {
   bytes32 public contentHash; // also refers to the content in swarm
+  uint public version;
+  mapping(uint => bytes32) public history;
+
   address public creator;
   address payable public rewardRecipient; // rewardRecipient must be an EOA
 
@@ -76,6 +79,7 @@ contract Article {
 
   constructor(bytes32 _contentHash, address _creator, address payable _rewardRecipient, address[] memory _citations) public {
     contentHash = _contentHash;
+    version = 0;
     creator = _creator;
     rewardRecipient = _rewardRecipient;
     factoryAddress = msg.sender;
@@ -87,10 +91,17 @@ contract Article {
     }
   }
 
+  function modify(bytes32 newHash) public creatorOnly {
+    history[version] = contentHash;
+    contentHash = newHash;
+    version += 1;
+  }
+
   function getSummary() public view returns
-  (bytes32, address, address, address[] memory, address[] memory, uint, uint, address[] memory) {
+  (bytes32, uint, address, address, address[] memory, address[] memory, uint, uint, address[] memory) {
     return (
     contentHash,
+    version,
     creator,
     rewardRecipient,
     citations,
