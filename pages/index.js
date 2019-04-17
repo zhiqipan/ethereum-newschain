@@ -41,7 +41,7 @@ class HomePage extends Component {
       return {
         header: article.title,
         meta: <Link route={`/articles/${addr}`}><a>View article</a></Link>,
-        description: <p style={{ marginTop: 10 }}>{article.body}</p>,
+        description: <p style={styles.bodyAbstract}>{article.body}</p>,
         fluid: true,
       };
     });
@@ -71,3 +71,13 @@ class HomePage extends Component {
 }
 
 export default HomePage;
+
+const styles = {
+  bodyAbstract: {
+    marginTop: 10,
+    overflowWrap: 'break-word',
+    maxHeight: 192,
+    lineHeight: '24px',
+    overflowY: 'hidden',
+  },
+};

@@ -40,7 +40,7 @@ export default class Article extends Component {
             </Menu>
           </Column>
         </Row>
-        <Row><Column>{body}</Column></Row>
+        <Row><Column><p style={{ overflowWrap: 'break-word' }}>{body}</p></Column></Row>
       </Grid>
     );
   }
