@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Button, Form, Input, TextArea, Message } from 'semantic-ui-react';
-import Layout from '../../components/Layout';
+import Layout from '../../client/components/Layout';
 import web3 from '../../ethereum/utils/web3';
 import factory from '../../ethereum/instances/factory';
 import { Router } from '../../routes';
-import { putToSwarm } from '../../utils/swarm';
+import { putToSwarm } from '../../client/utils/swarm';
 
 export default class ArticleNewPage extends Component {
   state = {

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Button, Form, Input, Message } from 'semantic-ui-react';
-import { Router } from '../routes';
-import web3 from '../ethereum/utils/web3';
-import getArticle from '../ethereum/instances/article';
+import { Router } from '../../routes';
+import web3 from '../../ethereum/utils/web3';
+import getArticle from '../../ethereum/instances/article';
 
 export default class RewardForm extends Component {
   static defaultProps = {

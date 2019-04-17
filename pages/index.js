@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Card } from 'semantic-ui-react';
 import factory from '../ethereum/instances/factory';
-import Layout from '../components/Layout';
+import Layout from '../client/components/Layout';
 import { Link } from '../routes';
 
 class HomePage extends Component {

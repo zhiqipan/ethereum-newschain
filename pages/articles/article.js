@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Button, Card, Divider, Grid } from 'semantic-ui-react';
 import { Link } from '../../routes';
-import Layout from '../../components/Layout';
-import RewardForm from '../../components/RewardForm';
+import Layout from '../../client/components/Layout';
+import RewardForm from '../../client/components/RewardForm';
 import web3 from '../../ethereum/utils/web3';
 import getArticle from '../../ethereum/instances/article';
-import { getFromSwarm } from '../../utils/swarm';
+import { getFromSwarm } from '../../client/utils/swarm';
 
 function translateSummary(original) {
   const summaryMap = [
