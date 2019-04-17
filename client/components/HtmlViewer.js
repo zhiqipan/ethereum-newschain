@@ -8,7 +8,7 @@ export default class HtmlViewer extends Component {
 
   render() {
     return (
-      <div style={this.props.style} dangerouslySetInnerHTML={{ __html: this.props.html }} />
+      <div style={{ overflowWrap: 'break-word', ...this.props.style }} dangerouslySetInnerHTML={{ __html: this.props.html }} />
     );
   }
 }

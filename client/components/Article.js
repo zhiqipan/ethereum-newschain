@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Grid, Menu, Icon, Label } from 'semantic-ui-react';
+import HtmlViewer from './HtmlViewer';
 
 export default class Article extends Component {
   static defaultProps = {
@@ -40,7 +41,11 @@ export default class Article extends Component {
             </Menu>
           </Column>
         </Row>
-        <Row><Column><p style={{ overflowWrap: 'break-word' }}>{body}</p></Column></Row>
+        <Row>
+          <Column>
+            <HtmlViewer html={body} />
+          </Column>
+        </Row>
       </Grid>
     );
   }
