@@ -77,6 +77,20 @@ contract Article {
     factoryAddress = msg.sender;
   }
 
+  function getSummary() public view returns
+    (bytes32 , address , address , address[] , address[] ,uint , uint , address[]) {
+      return (
+        contentHash,
+        creator,
+        rewardRecipient,
+        citations,
+        citedBy,
+        rewardValue,
+        rewardTimes,
+        tokenTypes
+      );
+  }
+
   function isArticle() external pure returns (bool) {
     return true;
   }
