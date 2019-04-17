@@ -1,6 +1,7 @@
 import 'braft-editor/dist/index.css';
 import React, { Component } from 'react';
 import BraftEditor from 'braft-editor';
+import HtmlViewer from './HtmlViewer';
 
 // basic demo: https://braft.margox.cn/demos/basic
 export default class MarkdownEditor extends Component {
@@ -15,14 +16,23 @@ export default class MarkdownEditor extends Component {
   };
 
   componentDidMount() {
+    console.log(this.props.initialHtml);
     this.setState({ editorState: BraftEditor.createEditorState(this.props.initialHtml) });
   }
 
   render() {
     const { editorState } = this.state;
 
+    if (this.props.disabled) {
+      return (
+        <div style={{ ...styles.wrapper, padding: 10 }}>
+          <HtmlViewer html={this.props.initialHtml} style={{ height: 574, overflow: 'auto' }} />
+        </div>
+      );
+    }
+
     return (
-      <div style={{ border: '1px solid lightgray', borderRadius: 4 }}>
+      <div style={styles.wrapper}>
         <BraftEditor
           value={editorState}
           onChange={editorState => {
@@ -39,3 +49,10 @@ export default class MarkdownEditor extends Component {
     );
   }
 }
+
+const styles = {
+  wrapper: {
+    border: '1px solid lightgray',
+    borderRadius: 4,
+  },
+};
