@@ -13,11 +13,11 @@ async function deploy(abi, bytecode, arguments = []) {
   console.info('Retrieving accounts');
   const accounts = await eth.getAccounts();
   console.info('Attempting to deploy from account', accounts[0]);
-  const result = await new eth.Contract(JSON.parse(abi))
+  const result = await new eth.Contract(abi)
     .deploy({ data: '0x' + bytecode, arguments })
     .send({ from: accounts[0] });
   console.info('Contract deployed to', result.options.address);
-  console.info('Contract interface:\n' + abi);
+  console.info('Contract interface:\n' + JSON.stringify(abi));
   console.info('More information:', `https://rinkeby.etherscan.io/address/${result.options.address}`);
   return result.options.address;
 }
@@ -27,8 +27,8 @@ const compiledToken = require('../build/NcToken');
 const compiledFactory = require('../build/ArticleFactory');
 
 async function run() {
-  const tokenAddress = await deploy(compiledToken.interface, compiledToken.bytecode);
-  const factoryAddress = await deploy(compiledFactory.interface, compiledFactory.bytecode, [false, 0, 0, tokenAddress]);  // (bool enableReward, uint citationCap, uint amount, address rewardFrom)
+  const tokenAddress = await deploy(compiledToken.abi, compiledToken.evm.bytecode.object);
+  const factoryAddress = await deploy(compiledFactory.abi, compiledFactory.evm.bytecode.object, [false, 0, 0, tokenAddress]);  // (bool enableReward, uint citationCap, uint amount, address rewardFrom)
 
   const tokenPath = path.resolve(__dirname, '..', 'config', 'token.address.json');
   const factoryPath = path.resolve(__dirname, '..', 'config', 'factory.address.json');
@@ -41,6 +41,8 @@ async function run() {
 run().then(addresses => {
   console.info('\n\nDeployment completed');
   console.info(addresses);
+  process.exit(0);
 }).catch(e => {
   console.error('Failed to deploy', e);
+  process.exit(1);
 });

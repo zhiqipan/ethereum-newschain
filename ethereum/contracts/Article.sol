@@ -1,4 +1,4 @@
-pragma solidity ^0.4.17;
+pragma solidity ^0.5.7;
 
 import './NcToken.sol';
 
@@ -14,7 +14,7 @@ contract ArticleFactory {
   uint public autoTokenRewardAmount;
   address public autoTokenRewardFrom;
 
-  function ArticleFactory(bool enableReward, uint citationCap, uint amount, address rewardFrom) public {
+  constructor(bool enableReward, uint citationCap, uint amount, address rewardFrom) public {
     enableAutoTokenReward = enableReward;
     autoTokenRewardCitationCap = citationCap;
     autoTokenRewardAmount = amount;
@@ -37,12 +37,12 @@ contract ArticleFactory {
     autoTokenRewardFrom = tokenAddr;
   }
 
-  function createArticle(bytes32 _contentHash, address _rewardRecipient) public {
-    address newArticle = new Article(_contentHash, msg.sender, _rewardRecipient);
+  function createArticle(bytes32 _contentHash, address payable _rewardRecipient, address[] memory _citations) public {
+    address newArticle = address(new Article(_contentHash, msg.sender, _rewardRecipient, _citations));
     deployedArticles.push(newArticle);
   }
 
-  function getArticles() public view returns (address[]) {
+  function getArticles() public view returns (address[] memory) {
     return deployedArticles;
   }
 }
@@ -54,7 +54,7 @@ contract ArticleFactory {
 contract Article {
   bytes32 public contentHash; // also refers to the content in swarm
   address public creator;
-  address public rewardRecipient; // rewardRecipient must be an EOA
+  address payable public rewardRecipient; // rewardRecipient must be an EOA
 
   uint public rewardValue;
   uint public rewardTimes;
@@ -70,40 +70,45 @@ contract Article {
   address factoryAddress;
   bool public autoTokenRewarded;
 
-  function Article(bytes32 _contentHash, address _creator, address _rewardRecipient) public {
+  constructor(bytes32 _contentHash, address _creator, address payable _rewardRecipient, address[] memory _citations) public {
     contentHash = _contentHash;
     creator = _creator;
     rewardRecipient = _rewardRecipient;
     factoryAddress = msg.sender;
+    for (uint i = 0; i < _citations.length; i++) {
+      citations.push(_citations[i]);
+      Article a = Article(_citations[i]);
+      a.addCitedBy();
+    }
   }
 
   function getSummary() public view returns
-    (bytes32 , address , address , address[] , address[] ,uint , uint , address[]) {
-      return (
-        contentHash,
-        creator,
-        rewardRecipient,
-        citations,
-        citedBy,
-        rewardValue,
-        rewardTimes,
-        tokenTypes
-      );
+  (bytes32, address, address, address[] memory, address[] memory, uint, uint, address[] memory) {
+    return (
+    contentHash,
+    creator,
+    rewardRecipient,
+    citations,
+    citedBy,
+    rewardValue,
+    rewardTimes,
+    tokenTypes
+    );
   }
 
   function isArticle() external pure returns (bool) {
     return true;
   }
 
-  function getTokenTypes() public view returns (address[]) {
+  function getTokenTypes() public view returns (address[] memory) {
     return tokenTypes;
   }
 
-  function getCitations() public view returns (address[] articles) {
+  function getCitations() public view returns (address[] memory articles) {
     return citations;
   }
 
-  function getCitedBy() public view returns (address[] articles) {
+  function getCitedBy() public view returns (address[] memory articles) {
     return citedBy;
   }
 
@@ -124,7 +129,7 @@ contract Article {
     ERC20Interface(tokenAddress).transferFrom(msg.sender, rewardRecipient, tokens); // should be approved first
   }
 
-  function addCitations(address[] others) public creatorOnly {
+  function addCitations(address[] memory others) public creatorOnly {
     for (uint i = 0; i < others.length; i++) {
       citations.push(others[i]);
       Article a = Article(others[i]);
@@ -151,14 +156,14 @@ contract Article {
     }
   }
 
-  function changeRewardRecipient(address newRewardRecipient) public {
+  function changeRewardRecipient(address payable newRewardRecipient) public {
     require(msg.sender == creator || msg.sender == rewardRecipient);
     rewardRecipient = newRewardRecipient;
   }
 
-  function() public payable {
-    reward();
-  }
+  //   function() external payable {
+  //     reward();
+  //   }
 
   modifier creatorOnly() {
     require(msg.sender == creator);

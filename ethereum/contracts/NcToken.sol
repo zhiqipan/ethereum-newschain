@@ -1,4 +1,4 @@
-pragma solidity ^0.4.17;
+pragma solidity ^0.5.7;
 
 import './Article.sol';
 
@@ -29,7 +29,7 @@ contract NcToken is ERC20Interface {
   event Transfer(address indexed from, address indexed to, uint tokens);
   event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 
-  function NcToken() public {
+  constructor() public {
     founder = msg.sender;
     // supply = 10000;
     // balances[founder] = 10000;
@@ -44,7 +44,7 @@ contract NcToken is ERC20Interface {
     require(tokens > 0);
 
     allowed[msg.sender][spender] = tokens;
-    Approval(msg.sender, spender, tokens); // emit
+    emit Approval(msg.sender, spender, tokens); // emit
     return true;
   }
 
@@ -73,7 +73,7 @@ contract NcToken is ERC20Interface {
 
     balances[to] += tokens;
     balances[msg.sender] -= tokens;
-    Transfer(msg.sender, to, tokens); // emit
+    emit Transfer(msg.sender, to, tokens); // emit
     return true;
   }
 

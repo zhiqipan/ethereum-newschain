@@ -17,7 +17,7 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "semantic-ui-react": "^0.86.0",
-    "solc": "0.4.25",
+    "solc": "0.5.7",
     "swarmgw": "^0.3.1",
     "truffle-hdwallet-provider": "0.0.6",
     "web3": "1.0.0-beta.35"

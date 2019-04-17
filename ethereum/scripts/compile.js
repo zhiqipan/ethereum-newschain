@@ -5,20 +5,31 @@ const solc = require('solc');
 function compile(inputPath, outputPath) {
   const sources = {};
   fs.readdirSync(inputPath).forEach(name => {
-    sources[name] = fs.readFileSync(path.resolve(inputPath, name), 'utf8');
+    sources[name] = { content: fs.readFileSync(path.resolve(inputPath, name), 'utf8') };
   });
 
-  const { contracts } = solc.compile({ sources }, 1);
+  const { contracts } = JSON.parse(solc.compile(JSON.stringify({
+    sources,
+    language: 'Solidity',
+    settings: {
+      outputSelection: {
+        '*': {
+          '*': ['*'],
+        },
+      },
+    },
+  })));
 
   console.info(`${Object.keys(contracts).length} contract(s) compiled`);
 
   fs.removeSync(outputPath);
   fs.ensureDirSync(outputPath);
 
-  Object.keys(contracts).forEach(key => {
-    const name = `${key.split(':')[1]}.json`;
-    console.info(`Writing contract to: ${name}`);
-    fs.outputJsonSync(path.resolve(outputPath, name), contracts[key]);
+  Object.keys(contracts).forEach(solFileName => {
+    Object.keys(contracts[solFileName]).forEach(contractName => {
+      console.info(`Writing contract to: ${contractName}.json`);
+      fs.outputJsonSync(path.resolve(outputPath, contractName + '.json'), contracts[solFileName][contractName]);
+    });
   });
 }
 
