@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { Button, Card, Form, Input, TextArea, Message, Divider, Label, Icon, Grid, Loader, Dimmer } from 'semantic-ui-react';
+import { Button, Form, Input, TextArea, Message, Loader } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
 import web3 from '../../ethereum/utils/web3';
-import factory from '../../ethereum/instances/factory';
 import { Router, Link } from '../../routes';
 import { getFromSwarm, putToSwarm } from '../../client/utils/swarm';
 import getArticle from '../../ethereum/instances/article';
