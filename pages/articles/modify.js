@@ -52,7 +52,7 @@ export default class ArticleModifyPage extends Component {
       console.info('Article published to Swarm:', hash);
       const result = await getArticle(this.props.address).methods.modify('0x' + hash).send({ from: account });
       console.info('Article confirmed on Ethereum:', `block #${result.blockNumber}, transaction ${result.transactionHash}`);
-      Router.replaceRoute(`/articles/${this.props.address}`);
+      await Router.replaceRoute(`/articles/${this.props.address}`);
     } catch (e) {
       console.error(e);
       this.setState({ errorMessage: e.message });
@@ -70,11 +70,11 @@ export default class ArticleModifyPage extends Component {
         <Form error={!!errorMessage} onSubmit={this.onSubmit}>
           <Form.Field>
             <label>Title</label>
-            <Input disabled={!isCreator} value={title} onChange={event => this.setState({ title: event.target.value })} />
+            <Input disabled={!isCreator || transacting} value={title} onChange={event => this.setState({ title: event.target.value })} />
           </Form.Field>
           <Form.Field>
             <label>Body</label>
-            <MarkdownEditor disabled={!isCreator} onChange={html => this.setState({ body: html })} initialHtml={body} />
+            <MarkdownEditor disabled={!isCreator || transacting} onChange={html => this.setState({ body: html })} initialHtml={body} />
           </Form.Field>
           {isCreator === true &&
           <React.Fragment>

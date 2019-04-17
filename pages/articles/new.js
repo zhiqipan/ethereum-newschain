@@ -7,6 +7,7 @@ import factory from '../../ethereum/instances/factory';
 import { Router, Link } from '../../routes';
 import { putToSwarm } from '../../client/utils/swarm';
 import { PicksContext } from '../../client/context/picks';
+import HtmlViewer from '../../client/components/HtmlViewer';
 
 const MarkdownEditor = process.browser ? dynamic(() => {
   return import('../../client/components/MarkdownEditor' /* webpackChunkName: 'MarkdownEditor' */);
@@ -37,7 +38,7 @@ export default class ArticleNewPage extends Component {
       });
       console.info('Article confirmed on Ethereum:', `block #${result.blockNumber}, transaction ${result.transactionHash}`);
       this.context.unpickAll();
-      Router.push('/');
+      await Router.replaceRoute('/');
     } catch (e) {
       console.error(e);
       this.setState({ errorMessage: e.message });
@@ -72,7 +73,7 @@ export default class ArticleNewPage extends Component {
               </Label>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <p style={{ height: 60 }}>{body.substr(0, 200)}{body.length > 200 && '...'}</p>
+              <HtmlViewer style={{ height: 96, lineHeight: '24px' }} html={body.replace(/<img[^>]*>/g, '')} />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
                   <Link route={`/articles/${addr}`}><a>View article</a></Link>
@@ -104,11 +105,11 @@ export default class ArticleNewPage extends Component {
         <Form error={!!errorMessage} onSubmit={this.onSubmit}>
           <Form.Field>
             <label>Title</label>
-            <Input value={title} onChange={event => this.setState({ title: event.target.value })} />
+            <Input disabled={transacting} value={title} onChange={event => this.setState({ title: event.target.value })} />
           </Form.Field>
           <Form.Field>
             <label>Body</label>
-            <MarkdownEditor onChange={html => this.setState({ body: html })} initialHtml={body} />
+            <MarkdownEditor disabled={transacting} onChange={html => this.setState({ body: html })} initialHtml={body} />
           </Form.Field>
           <Button disabled={transacting} primary loading={transacting}>Create</Button>
           <Message error header='Oops...' content={errorMessage} />

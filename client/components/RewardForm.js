@@ -37,7 +37,7 @@ export default class RewardForm extends Component {
       console.error(e);
       this.setState({ errorMessage: e.message });
     }
-    Router.replaceRoute(`/articles/${this.props.address}`);
+    await Router.replaceRoute(`/articles/${this.props.address}`);
     this.setState({ transacting: false });
   };
 

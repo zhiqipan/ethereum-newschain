@@ -16,7 +16,6 @@ export default class MarkdownEditor extends Component {
   };
 
   componentDidMount() {
-    console.log(this.props.initialHtml);
     this.setState({ editorState: BraftEditor.createEditorState(this.props.initialHtml) });
   }
 
