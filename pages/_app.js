@@ -3,21 +3,22 @@ import React from 'react';
 import { PicksContext } from '../client/context/picks';
 
 export default class MyApp extends App {
-  pick = article => {
+  pick = (address, payload) => {
     this.setState(state => {
-      if (state.articles.includes(article)) return {};
-      else return { articles: [...state.articles, article] };
+      state.articles[address] = payload;
+      return { articles: { ...state.articles } };
     });
   };
 
-  unpick = article => {
-    this.setState(state => ({
-      articles: [...state.articles.filter(a => a !== article)],
-    }));
+  unpick = address => {
+    this.setState(state => {
+      delete state.articles[address];
+      return { articles: { ...state.articles } };
+    });
   };
 
   state = {
-    articles: [],
+    articles: {},
     pick: this.pick,
     unpick: this.unpick,
   };

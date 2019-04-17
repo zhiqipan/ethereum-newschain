@@ -86,7 +86,7 @@ export default class ArticleDetailPage extends Component {
 
   render() {
     const { address, contentHash } = this.props;
-    const { articles: pickedArticles } = this.context;
+    const picked = this.context.articles[address];
 
     return (
       <Layout>
@@ -116,10 +116,10 @@ export default class ArticleDetailPage extends Component {
           </Grid.Row>
         </Grid>
         <Divider />
-        {!pickedArticles.includes(address) &&
-        <Button primary content='Pick to cite' onClick={() => this.context.pick(address)} />
+        {!picked &&
+        <Button primary content='Pick to cite' onClick={() => this.context.pick(address, { contentHash })} />
         }
-        {pickedArticles.includes(address) &&
+        {picked &&
         <Button negative content='Unpick' onClick={() => this.context.unpick(address)} />
         }
       </Layout>

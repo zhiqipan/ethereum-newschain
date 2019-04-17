@@ -3,7 +3,6 @@ import { Button, Card, Form, Input, TextArea, Message, Divider } from 'semantic-
 import Layout from '../../client/components/Layout';
 import web3 from '../../ethereum/utils/web3';
 import factory from '../../ethereum/instances/factory';
-import getArticle from '../../ethereum/instances/article';
 import { Router, Link } from '../../routes';
 import { putToSwarm } from '../../client/utils/swarm';
 import { PicksContext } from '../../client/context/picks';
@@ -27,10 +26,11 @@ export default class ArticleNewPage extends Component {
       console.info('Publishing article to Swarm...');
       const hash = await putToSwarm(JSON.stringify({ title, body }));
       const account = (await web3.eth.getAccounts())[0];
-      console.info('Article published', hash);
-      await factory.methods.createArticle('0x' + hash, account).send({
+      console.info('Article published to Swarm:', hash);
+      const result = await factory.methods.createArticle('0x' + hash, account, Object.keys(this.context.articles)).send({
         from: account,
       });
+      console.info('Article confirmed on Ethereum:', `block #${result.blockNumber}, transaction ${result.transactionHash}`);
       Router.push('/');
     } catch (e) {
       console.error(e);
@@ -42,12 +42,10 @@ export default class ArticleNewPage extends Component {
   renderPickedArticles() {
     const { articles } = this.context;
 
-    console.log(this.context);
-
-    const items = articles.map(addr => {
-      console.log(addr);
+    const items = Object.keys(articles).map(addr => {
       return {
         header: addr,
+        meta: articles[addr].contentHash,
         description: (
           <Link route={`/articles/${addr}`}>
             <a>View article</a>

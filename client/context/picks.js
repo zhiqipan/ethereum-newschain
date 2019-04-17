@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const PicksContext = React.createContext({
-  articles: [],
-  pick: article => {},
-  unpick: article => {},
+  articles: {},
+  pick: (address, payload) => {},
+  unpick: (address) => {},
 });
