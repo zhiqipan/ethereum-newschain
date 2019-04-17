@@ -125,7 +125,7 @@ export default class ArticleDetailPage extends Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column>
-              <Segment raised stacked>
+              <Segment raised style={{ overflowY: 'auto', maxHeight: 580 }}>
                 {this.renderContent()}
               </Segment>
             </Grid.Column>
