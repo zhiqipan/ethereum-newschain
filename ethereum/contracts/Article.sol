@@ -46,9 +46,10 @@ contract ArticleFactory {
     autoTokenRewardAmount = amount;
   }
 
-  function setAutoTokenRewardFrom(address tokenAddr) public adminOnly {
-    autoTokenRewardFrom = tokenAddr;
-  }
+  // should not change token address
+  // function setAutoTokenRewardFrom(address tokenAddr) public adminOnly {
+  //   autoTokenRewardFrom = tokenAddr;
+  // }
 
   function createArticle(bytes32 _contentHash, address payable _rewardRecipient, address[] memory _citations) public {
     address newArticle = address(new Article(_contentHash, msg.sender, _rewardRecipient, _citations));
