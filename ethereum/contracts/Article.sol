@@ -7,6 +7,7 @@ import './NcToken.sol';
  * @dev Contract of article factory, use this factory to create articles
  **/
 contract ArticleFactory {
+  address public admin;
   address[] public deployedArticles;
 
   bool public enableAutoTokenReward;
@@ -21,19 +22,19 @@ contract ArticleFactory {
     autoTokenRewardFrom = rewardFrom;
   }
 
-  function setEnableAutoTokenReward(bool enable) public {
+  function setEnableAutoTokenReward(bool enable) public adminOnly {
     enableAutoTokenReward = enable;
   }
 
-  function setAutoTokenRewardCitationCap(uint cap) public {
+  function setAutoTokenRewardCitationCap(uint cap) public adminOnly {
     autoTokenRewardCitationCap = cap;
   }
 
-  function setAutoTokenRewardAmount(uint amount) public {
+  function setAutoTokenRewardAmount(uint amount) public adminOnly {
     autoTokenRewardAmount = amount;
   }
 
-  function setAutoTokenRewardFrom(address tokenAddr) public {
+  function setAutoTokenRewardFrom(address tokenAddr) public adminOnly {
     autoTokenRewardFrom = tokenAddr;
   }
 
@@ -48,6 +49,11 @@ contract ArticleFactory {
 
   function getArticles() public view returns (address[] memory) {
     return deployedArticles;
+  }
+
+  modifier adminOnly() {
+    require(msg.sender == admin);
+    _;
   }
 }
 
