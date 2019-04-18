@@ -7,6 +7,7 @@ export default class TxForm extends Component {
     submitButtonOptions: { content: 'Transact' },
     width: 6,
     fields: [],
+    getTransactingMessage: async (formData) => null,
     getWarningMessage: async (formData) => null,
     getSuccessMessage: async (formData, result) => null,
     transaction: async (formData) => null,
@@ -15,6 +16,7 @@ export default class TxForm extends Component {
 
   state = {
     transacting: false,
+    transactingMessage: '',
     errorMessage: '',
     warningMessage: '',
     successMessage: '',
@@ -23,9 +25,7 @@ export default class TxForm extends Component {
   componentDidMount() {
     const defaults = {};
     this.props.fields.forEach(({ name, defaultValue }) => {
-      if (defaultValue !== undefined) {
-        defaults['_' + name] = defaultValue;
-      }
+      defaults['_' + name] = defaultValue;
     });
     this.setState({ ...defaults });
   }
@@ -49,10 +49,11 @@ export default class TxForm extends Component {
       return null;
     }
 
-    this.setState({ transacting: true, errorMessage: '', warningMessage: '' });
-
     const formData = {};
     this.props.fields.forEach(({ name }) => formData[name] = this.state['_' + name]);
+
+    const transactingMessage = await this.props.getTransactingMessage(formData);
+    this.setState({ transacting: true, transactingMessage, errorMessage: '', warningMessage: '' });
 
     const warningMessage = await this.props.getWarningMessage(formData);
     this.setState({ warningMessage });
@@ -78,23 +79,24 @@ export default class TxForm extends Component {
 
   render() {
     const { width, submitButtonOptions, fields } = this.props;
-    const { transacting, errorMessage, warningMessage, successMessage } = this.state;
+    const { transacting, transactingMessage, errorMessage, warningMessage, successMessage } = this.state;
     return (
       <Grid>
         <Grid.Column width={width} textAlign='left'>
           <Form error={!!errorMessage} warning={!!warningMessage} onSubmit={this.onFormSubmit}>
             {fields.map(field => {
-              const { name, label, ...restProps } = field;
+              const { name, label, inputLabel, ...restProps } = field;
               return (
                 <Form.Field key={name}>
                   <label>{label}</label>
-                  <Input value={this.state['_' + name]} onChange={this.onFieldChange(name)} {...restProps} />
+                  <Input value={this.state['_' + name]} onChange={this.onFieldChange(name)} label={inputLabel} {...restProps} />
                 </Form.Field>
               );
             })}
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <Button style={{ margin: 0 }} {...submitButtonOptions} loading={transacting} disabled={transacting} />
             </div>
+            <Message hidden={!transacting} header={'Transacting...'} content={transactingMessage} />
             <Message error header='Oops...' content={errorMessage} />
             <Message warning header='Warning' content={warningMessage} />
             <Message positive hidden={!successMessage} header='Successful' content={successMessage} />

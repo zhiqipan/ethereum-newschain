@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Form, Input, Label, Message } from 'semantic-ui-react';
+import { Button, Form, Input, Message } from 'semantic-ui-react';
 import { Router, Link } from '../../routes';
 import web3 from '../../ethereum/utils/web3';
 import getArticle from '../../ethereum/instances/article';
@@ -8,6 +8,7 @@ import { tokenAddress as nctAddress } from '../../ethereum/instances/token';
 import TokenLabel from './TokenLabel';
 import { isValidAddress } from '../utils/validate';
 
+// do not use TxForm in this component, this is too complicated and customized
 export default class RewardTokenForm extends Component {
   static defaultProps = {
     address: null,
