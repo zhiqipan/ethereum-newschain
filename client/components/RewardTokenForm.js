@@ -19,6 +19,8 @@ export default class RewardTokenForm extends Component {
     tokenName: '',
     tokenSymbol: '',
     approvedAmount: null,
+    transferFrom: '',
+    currentAccount: '',
     transacting: false,
     errorMessage: null,
     showSuccessMessage: false,
@@ -27,6 +29,8 @@ export default class RewardTokenForm extends Component {
   async componentDidMount() {
     await this.updateERC20Name();
     await this.updateApprovedAmount();
+    const currentAccount = (await web3.eth.getAccounts())[0];
+    this.setState({ transferFrom: currentAccount, currentAccount });
   }
 
   async componentDidUpdate(prevProps, prevState) {
@@ -34,7 +38,7 @@ export default class RewardTokenForm extends Component {
       this.setState({ tokenAddress: this.props.fromNct ? nctAddress : '' });
     }
 
-    if (prevProps.rewardRecipient !== this.props.rewardRecipient) {
+    if (prevProps.rewardRecipient !== this.props.rewardRecipient || prevState.transferFrom !== this.state.transferFrom) {
       await this.updateApprovedAmount();
     }
 
@@ -62,18 +66,17 @@ export default class RewardTokenForm extends Component {
   };
 
   updateApprovedAmount = async () => {
-    const { tokenAddress } = this.state;
+    const { tokenAddress, transferFrom } = this.state;
     const { rewardRecipient } = this.props;
-    if (!tokenAddress || !rewardRecipient || tokenAddress.length !== 42 || rewardRecipient.length !== 42) {
+    if (!tokenAddress || !rewardRecipient || !transferFrom || tokenAddress.length !== 42 || rewardRecipient.length !== 42 || transferFrom.length !== 42) {
       this.setState({ approvedAmount: null });
       return;
     }
 
     try {
       const erc20 = getERC20(tokenAddress);
-      const account = (await web3.eth.getAccounts())[0];
       const approvedAmount = await erc20.methods
-        .allowance(account, rewardRecipient)
+        .allowance(transferFrom, rewardRecipient)
         .call();
       this.setState({ approvedAmount });
     } catch (e) {
@@ -83,10 +86,9 @@ export default class RewardTokenForm extends Component {
 
   confirmTransfer = async () => {
     const article = getArticle(this.props.address);
-    const account = (await web3.eth.getAccounts())[0];
     await article.methods
       .rewardToken(this.state.tokenAddress, this.state.tokenAmount)
-      .send({ from: account });
+      .send({ from: this.state.transferFrom });
   };
 
   onSubmit = async event => {
@@ -109,7 +111,10 @@ export default class RewardTokenForm extends Component {
   };
 
   render() {
-    const { tokenAddress, tokenAmount, transacting, errorMessage, showSuccessMessage } = this.state;
+    const {
+      tokenAddress, tokenAmount, approvedAmount, tokenName, tokenSymbol, transferFrom, currentAccount,
+      transacting, errorMessage, showSuccessMessage,
+    } = this.state;
 
     return (
       <Form error={!!errorMessage} onSubmit={this.onSubmit}>
@@ -120,13 +125,21 @@ export default class RewardTokenForm extends Component {
             value={tokenAddress}
             onChange={event => this.setState({ tokenAddress: event.target.value })}
           />
-          <Label color={!this.state.tokenName && !this.state.tokenSymbol ? 'red' : 'blue'} basic style={{ marginTop: 10 }}>
-            {!this.state.tokenName && !this.state.tokenSymbol &&
+          <Label color={!tokenName && !tokenSymbol ? 'red' : 'blue'} basic style={{ marginTop: 10 }}>
+            {!tokenName && !tokenSymbol &&
             <span>Unrecognized token</span>
             }
-            {this.state.tokenName && <span>{this.state.tokenName}</span>}
-            {this.state.tokenSymbol && <Label.Detail>{this.state.tokenSymbol}</Label.Detail>}
+            {tokenName && <span>{tokenName}</span>}
+            {tokenSymbol && <Label.Detail>{tokenSymbol}</Label.Detail>}
           </Label>
+        </Form.Field>
+        <Form.Field>
+          <label>Transfer from (pre-approved)</label>
+          <Input
+            value={transferFrom}
+            onChange={event => this.setState({ transferFrom: event.target.value })}
+          />
+          {currentAccount !== transferFrom && <div style={{ color: 'gray' }}>The above account is not your current account</div>}
         </Form.Field>
         <Form.Field>
           <label>Amount to reward</label>
@@ -146,12 +159,12 @@ export default class RewardTokenForm extends Component {
         <Message hidden={transacting} color='blue'>
           <Message.Header>Reminder: ERC20 Standard</Message.Header>
           <p>Please approve your transfer first according to the standard procedure</p>
-          {!isNaN(parseFloat(this.state.approvedAmount)) &&
+          {!isNaN(parseFloat(approvedAmount)) &&
           <div>
-            <p style={{ color: this.state.approvedAmount >= this.state.tokenAmount ? 'inherit' : '#db2828' }}>
-              Approved amount: {this.state.approvedAmount}
+            <p style={{ color: approvedAmount >= tokenAmount ? 'inherit' : '#db2828' }}>
+              Approved amount: {approvedAmount}
             </p>
-            {this.state.approvedAmount < this.state.tokenAmount &&
+            {approvedAmount < tokenAmount &&
             <Link route={`/tokens/${tokenAddress}/approve?article=${this.props.address}`}>
               <Button secondary content='Go approve' />
             </Link>
