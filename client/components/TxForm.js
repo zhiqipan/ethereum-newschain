@@ -20,6 +20,16 @@ export default class TxForm extends Component {
     successMessage: '',
   };
 
+  componentDidMount() {
+    const defaults = {};
+    this.props.fields.forEach(({ name, defaultValue }) => {
+      if (defaultValue !== undefined) {
+        defaults['_' + name] = defaultValue;
+      }
+    });
+    this.setState({ ...defaults });
+  }
+
   onFieldChange = name => e => this.setState({ ['_' + name]: e.target.value });
 
   onFormSubmit = async () => {
@@ -34,7 +44,10 @@ export default class TxForm extends Component {
       }
     }).filter(Boolean).length === this.props.fields.length;
 
-    if (!valid) return null;
+    if (!valid) {
+      this.setState({ errorMessage: 'Cannot proceed because of invalid input' });
+      return null;
+    }
 
     this.setState({ transacting: true, errorMessage: '', warningMessage: '' });
 
