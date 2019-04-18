@@ -9,10 +9,11 @@ export default class Article extends Component {
     title: '',
     body: '',
     version: 0,
+    autoTokenRewarded: false,
   };
 
   render() {
-    const { address, contentHash, title, body } = this.props;
+    const { address, contentHash, title, body, autoTokenRewarded } = this.props;
     const version = parseInt(this.props.version);
     const { Row, Column } = Grid;
     return (
@@ -20,7 +21,8 @@ export default class Article extends Component {
         <Row>
           <Column>
             <h2>{title}</h2>
-            <Label color='purple'>{version === 0 ? 'Initial version' : `Modified | Version: ${version + 1}`}</Label>
+            <Label color='brown'>{version === 0 ? 'Initial version' : `Modified | version: ${version + 1}`}</Label>
+            {autoTokenRewarded && <Label color='pink'>NCT auto rewarded</Label>}
           </Column>
           <Column textAlign='right'>
             <Menu compact borderless secondary icon='labeled'>

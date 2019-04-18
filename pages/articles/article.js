@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Card, Divider, Grid, Icon, Label, Menu, Segment } from 'semantic-ui-react';
+import { Button, Card, Divider, Grid, Icon, Label, Segment } from 'semantic-ui-react';
 import { Link } from '../../routes';
 import Layout from '../../client/components/Layout';
 import RewardForm from '../../client/components/RewardForm';
@@ -19,31 +19,37 @@ export default class ArticleDetailPage extends Component {
   }
 
   renderSummary() {
-    const { citations, citedBy, rewardValue, rewardTimes, tokenTypes } = this.props;
+    const { citations, citedBy, rewardValue, rewardTimes, tokenTypes, ncTokenReward } = this.props;
+    const rewardValueEther = web3.utils.fromWei(rewardValue.toString(), 'ether');
+    const otherTokenTypes = ncTokenReward > 0 ? tokenTypes.length - 1 : tokenTypes.length;
+
+    function word(int, name) {
+      return int + ' ' + name + (int > 1 ? 's' : '');
+    }
 
     const items = [{
-      header: `Refers to ${citations.length} article(s)`,
+      header: `Cites ${word(citations.length, 'article')}`,
       meta: 'Number of citations of this article',
-      description: 'How many other articles the author refers to / gets inspiration from',
+      description: 'How many other articles inspires the author',
     }, {
-      header: `Cited by ${citedBy.length} article(s)`,
+      header: `Cited by ${word(citedBy.length, 'article')}`,
       meta: 'The influence of this article',
-      description: 'The more other articles cite this article, the more influential this article is',
+      description: 'The more cited, the more influential the article is',
     }, {
-      header: `${web3.utils.fromWei(rewardValue.toString(), 'ether')} ether in ${rewardTimes} time(s)`,
+      header: `${rewardValueEther} ether in ${word(rewardTimes, 'time')}`,
       meta: 'Reward gained',
       description: `This article has been rewarded by ether`,
     }, {
-      header: `${tokenTypes.length} type(s) of tokens`,
+      header: `${word(ncTokenReward, 'NCT')}, ${word(otherTokenTypes, 'type')} of others`,
       meta: 'Tokens gained',
-      description: `This article has been rewarded by tokens`,
+      description: `This article has been rewarded by tokens (NewsChain Token or others)`,
     }];
 
     return <Card.Group itemsPerRow={4} items={items} />;
   }
 
   render() {
-    const { address, contentHash, title, body, citations, citedBy, rewardValue, version, creator, rewardRecipient } = this.props;
+    const { address, contentHash, title, body, citations, citedBy, rewardValue, version, creator, rewardRecipient, autoTokenRewarded } = this.props;
     const picked = this.context.articles[address];
     const payload = {
       contentHash,
@@ -94,6 +100,7 @@ export default class ArticleDetailPage extends Component {
                   title={title}
                   body={body}
                   version={version}
+                  autoTokenRewarded={autoTokenRewarded}
                 />
               </Segment>
             </Grid.Column>
