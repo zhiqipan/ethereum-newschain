@@ -1,3 +1,4 @@
+import 'braft-editor/dist/index.css';
 import React, { Component } from 'react';
 import Head from 'next/head';
 import { Container } from 'semantic-ui-react';

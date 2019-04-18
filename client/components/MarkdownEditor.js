@@ -1,4 +1,3 @@
-import 'braft-editor/dist/index.css';
 import React, { Component } from 'react';
 import BraftEditor from 'braft-editor';
 import HtmlViewer from './HtmlViewer';
