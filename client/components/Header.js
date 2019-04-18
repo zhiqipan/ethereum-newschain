@@ -3,20 +3,19 @@ import { Menu } from 'semantic-ui-react';
 import { Link } from '../../routes';
 
 export default class Header extends Component {
+  state = {
+    active: '',
+  };
+
   render() {
     return (
       <Menu>
-        <Link route='/'>
-          <a className='item'>NewsChain</a>
-        </Link>
+        <Menu.Item href='/' style={{ color: '#f2711c' }}>NewsChain</Menu.Item>
+        <Menu.Item href='/articles'>Articles</Menu.Item>
+        <Menu.Item href='/tokens'>Tokens</Menu.Item>
 
         <Menu.Menu position='right'>
-          <Link route='/'>
-            <a className='item'>Articles</a>
-          </Link>
-          <Link route='/articles/new'>
-            <a className='item'>+</a>
-          </Link>
+          <Menu.Item href='/articles/new'>+</Menu.Item>
         </Menu.Menu>
       </Menu>
     );

@@ -1,84 +1,47 @@
 import React, { Component } from 'react';
-import { Button, Card, Dimmer, Loader } from 'semantic-ui-react';
-import factory from '../ethereum/instances/factory';
 import Layout from '../client/components/Layout';
+import { Button, Card, Grid, Statistic } from 'semantic-ui-react';
 import { Link } from '../routes';
-import loadArticleDetail from '../client/utils/loadArticleDetail';
-import HtmlViewer from '../client/components/HtmlViewer';
+import factory from '../ethereum/instances/factory';
+import token from '../ethereum/instances/token';
 
-const cachedArticles = {};
+export default class IndexPage extends Component {
 
-class HomePage extends Component {
-  static async getInitialProps() {
+  async componentDidMount() {
     const articles = await factory.methods.getArticles().call();
-    return { articles };
+    const tokenSupply = await token.methods.totalSupply().call();
+    this.setState({ articleCount: articles.length, tokenSupply });
   }
 
   state = {
-    articles: {},
+    articleCount: 0,
+    tokenSupply: 0,
   };
 
-  renderArticles() {
-    const items = this.props.articles.map(addr => {
-      const article = this.state.articles[addr] || cachedArticles[addr];
-
-      if (!article) {
-        loadArticleDetail(addr).then(detail => {
-          this.setState(state => {
-            state.articles[addr] = detail;
-            cachedArticles[addr] = detail;
-            return { articles: { ...state.articles } };
-          });
-        });
-
-        return {
-          header: addr,
-          meta: <Link route={`/articles/${addr}`}><a>View article</a></Link>,
-          description: <Loader active />,
-          fluid: true,
-        };
-      }
-
-      return {
-        header: article.title,
-        meta: <Link route={`/articles/${addr}`}><a>View article</a></Link>,
-        description: <HtmlViewer html={article.body.replace(/<img[^>]*>/g, '')} style={styles.bodyAbstract} />,
-        fluid: true,
-      };
-    });
-
-    return <Card.Group items={items} />;
-  }
-
   render() {
-    // Wrapping <Button> in <a> tag gives the right-click functionality in browser, e.g. opening in new tab
     return (
       <Layout>
-        <h3>Published articles</h3>
-        <Link route='/articles/new'>
-          <a>
-            <Button
-              content='Draft article'
-              icon='add circle'
-              floated='right'
-              primary
-            />
-          </a>
-        </Link>
-        {this.renderArticles()}
+        <Card fluid style={{ height: 300 }}>
+          <Card.Content>
+            <Grid columns='equal' textAlign='center' style={{ height: 300 }}>
+              <Grid.Column style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Statistic color='orange' label='Starts from' value={2019} size='huge' />
+              </Grid.Column>
+              <Grid.Column style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Statistic color='orange' label='Articles published' value={this.state.articleCount} size='huge' />
+              </Grid.Column>
+              <Grid.Column style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Statistic color='orange' label='NC Tokens generated' value={this.state.tokenSupply} size='huge' />
+              </Grid.Column>
+            </Grid>
+          </Card.Content>
+        </Card>
+        <div style={{ marginTop: 20, textAlign: 'center' }}>
+          <Link route='/articles'>
+            <Button color='orange' size='large'>More to discover...</Button>
+          </Link>
+        </div>
       </Layout>
     );
   }
 }
-
-export default HomePage;
-
-const styles = {
-  bodyAbstract: {
-    marginTop: 10,
-    overflowWrap: 'break-word',
-    maxHeight: 192,
-    lineHeight: '24px',
-    overflowY: 'hidden',
-  },
-};
