@@ -13,6 +13,7 @@ export default class Header extends Component {
         <Menu.Item href='/' style={{ color: '#f2711c' }}>NewsChain</Menu.Item>
         <Menu.Item href='/articles'>Articles</Menu.Item>
         <Menu.Item href='/tokens'>Tokens</Menu.Item>
+        <Menu.Item href='/factory'>Factory</Menu.Item>
 
         <Menu.Menu position='right'>
           <Menu.Item href='/articles/new'>+</Menu.Item>
