@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Form, Input, Label, Message } from 'semantic-ui-react';
-import { Router } from '../../routes';
+import { Router, Link } from '../../routes';
 import web3 from '../../ethereum/utils/web3';
 import getArticle from '../../ethereum/instances/article';
 import getERC20 from '../../ethereum/instances/erc20';
@@ -94,6 +94,7 @@ export default class RewardTokenForm extends Component {
     this.setState({ transacting: true, errorMessage: null });
     try {
       await this.confirmTransfer();
+      this.setState({ approvedAmount: this.state.approvedAmount - this.state.tokenAmount });
       if (process.browser) {
         this.setState({ showSuccessMessage: true }, () => {
           setTimeout(() => this.setState({ showSuccessMessage: false }), 3000);
@@ -146,9 +147,16 @@ export default class RewardTokenForm extends Component {
           <Message.Header>Reminder: ERC20 Standard</Message.Header>
           <p>Please approve your transfer first according to the standard procedure</p>
           {!isNaN(parseFloat(this.state.approvedAmount)) &&
-          <p style={{ color: this.state.approvedAmount >= this.state.tokenAmount ? 'inherit' : '#db2828' }}>
-            Approved amount: {this.state.approvedAmount}
-          </p>
+          <div>
+            <p style={{ color: this.state.approvedAmount >= this.state.tokenAmount ? 'inherit' : '#db2828' }}>
+              Approved amount: {this.state.approvedAmount}
+            </p>
+            {this.state.approvedAmount < this.state.tokenAmount &&
+            <Link route={`/tokens/${tokenAddress}/approve?article=${this.props.address}`}>
+              <Button secondary content='Go approve' />
+            </Link>
+            }
+          </div>
           }
         </Message>
         <Message hidden={!transacting}>

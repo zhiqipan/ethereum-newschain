@@ -8,7 +8,7 @@ export default class Article extends Component {
     contentHash: '',
     title: '',
     body: '',
-    version: 0,
+    version: null,
     autoTokenRewarded: false,
   };
 
@@ -21,7 +21,7 @@ export default class Article extends Component {
         <Row>
           <Column>
             <h2>{title}</h2>
-            <Label color='brown'>{version === 0 ? 'Initial version' : `Modified | version: ${version + 1}`}</Label>
+            {!isNaN(version) && <Label color='brown'>{version === 0 ? 'Initial version' : `Modified | version: ${version + 1}`}</Label>}
             {autoTokenRewarded && <Label color='pink'>NCT auto rewarded</Label>}
           </Column>
           <Column textAlign='right'>
