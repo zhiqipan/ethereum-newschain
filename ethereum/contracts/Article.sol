@@ -13,13 +13,25 @@ contract ArticleFactory {
   bool public enableAutoTokenReward;
   uint public autoTokenRewardCitationCap;
   uint public autoTokenRewardAmount;
-  address public autoTokenRewardFrom;
+  address public autoTokenRewardFrom; // should be an NcToken
 
   constructor(bool enableReward, uint citationCap, uint amount, address rewardFrom) public {
+    admin = msg.sender;
     enableAutoTokenReward = enableReward;
     autoTokenRewardCitationCap = citationCap;
     autoTokenRewardAmount = amount;
     autoTokenRewardFrom = rewardFrom;
+  }
+
+  function getSummary() public view returns (address, uint, bool, uint, uint, address) {
+    return (
+    admin,
+    deployedArticles.length,
+    enableAutoTokenReward,
+    autoTokenRewardCitationCap,
+    autoTokenRewardAmount,
+    autoTokenRewardFrom
+    );
   }
 
   function setEnableAutoTokenReward(bool enable) public adminOnly {
