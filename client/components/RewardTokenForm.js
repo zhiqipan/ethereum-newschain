@@ -5,6 +5,7 @@ import web3 from '../../ethereum/utils/web3';
 import getArticle from '../../ethereum/instances/article';
 import getERC20 from '../../ethereum/instances/erc20';
 import { tokenAddress as nctAddress } from '../../ethereum/instances/token';
+import TokenLabel from './TokenLabel';
 
 export default class RewardTokenForm extends Component {
   static defaultProps = {
@@ -125,13 +126,7 @@ export default class RewardTokenForm extends Component {
             value={tokenAddress}
             onChange={event => this.setState({ tokenAddress: event.target.value })}
           />
-          <Label color={!tokenName && !tokenSymbol ? 'red' : 'blue'} basic style={{ marginTop: 10 }}>
-            {!tokenName && !tokenSymbol &&
-            <span>Unrecognized token</span>
-            }
-            {tokenName && <span>{tokenName}</span>}
-            {tokenSymbol && <Label.Detail>{tokenSymbol}</Label.Detail>}
-          </Label>
+          <TokenLabel name={tokenName} symbol={tokenSymbol} style={{ marginTop: 10 }} />
         </Form.Field>
         <Form.Field>
           <label>Transfer from (pre-approved)</label>
@@ -165,7 +160,7 @@ export default class RewardTokenForm extends Component {
               Approved amount: {approvedAmount}
             </p>
             {approvedAmount < tokenAmount &&
-            <Link route={`/tokens/${tokenAddress}/approve?article=${this.props.address}`}>
+            <Link route={`/tokens/${tokenAddress}/approve/${this.props.address}`}>
               <Button secondary content='Go approve' />
             </Link>
             }

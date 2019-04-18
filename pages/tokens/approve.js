@@ -1,23 +1,23 @@
 import React, { Component } from 'react';
-import { Button, Form, Input, Segment } from 'semantic-ui-react';
+import { Button, Card, Form, Grid, Input, Segment, Statistic } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
 import getArticle from '../../ethereum/instances/article';
 import getERC20 from '../../ethereum/instances/erc20';
 import web3 from '../../ethereum/utils/web3';
 import { getFromSwarm } from '../../client/utils/swarm';
-import HtmlViewer from '../../client/components/HtmlViewer';
+import ArticleAbstractCard from '../../client/components/ArticleAbstractCard';
+import TokenLabel from '../../client/components/TokenLabel';
+import AddressLabel from '../../client/components/AddressLabel';
 
 export default class TokenApprovePage extends Component {
   static async getInitialProps(props) {
     const { token: tokenAddr, article: articleAddr } = props.query;
     const result = {};
 
-    if (articleAddr) {
-      const rewardRecipient = await getArticle(articleAddr).methods.rewardRecipient().call();
-      const contentHash = await getArticle(articleAddr).methods.contentHash().call();
-      const { title, body } = JSON.parse(await getFromSwarm(contentHash.replace('0x', '')));
-      result.article = { address: articleAddr, rewardRecipient, contentHash, title, body };
-    }
+    const rewardRecipient = await getArticle(articleAddr).methods.rewardRecipient().call();
+    const contentHash = await getArticle(articleAddr).methods.contentHash().call();
+    const { title, body } = JSON.parse(await getFromSwarm(contentHash.replace('0x', '')));
+    result.article = { address: articleAddr, rewardRecipient, contentHash, title, body };
 
     const tokenName = await getERC20(tokenAddr).methods.name().call();
     const tokenSymbol = await getERC20(tokenAddr).methods.symbol().call();
@@ -27,17 +27,19 @@ export default class TokenApprovePage extends Component {
   }
 
   state = {
-    recipient: this.props.article && this.props.article.rewardRecipient,
     approvedAmount: null,
     amountToApprove: 0,
+    account: '',
+    balance: null,
   };
 
   async componentDidMount() {
     const { address } = this.props.token;
     const { rewardRecipient: recipient } = this.props.article;
-    const spender = (await web3.eth.getAccounts())[0];
-    const approvedAmount = parseFloat(await getERC20(address).methods.allowance(spender, recipient).call());
-    this.setState({ approvedAmount });
+    const account = (await web3.eth.getAccounts())[0];
+    const approvedAmount = parseFloat(await getERC20(address).methods.allowance(account, recipient).call());
+    const balance = parseFloat(await getERC20(address).methods.balanceOf(account).call());
+    this.setState({ account, balance, approvedAmount });
   }
 
   approve = async () => {
@@ -54,57 +56,59 @@ export default class TokenApprovePage extends Component {
     this.setState({ approvedAmount: this.state.approvedAmount + amountToApprove });
   };
 
-  renderArticleRelated() {
-    const { article } = this.props;
-    if (!article) return null;
-
-    return (
-      <Segment raised>
-        <p>Article recipient recipient: {article.rewardRecipient}</p>
-        <h3>{article.title}</h3>
-        <HtmlViewer html={article.body.replace(/<img[^>]*>/g, '')} style={styles.bodyAbstract} />
-      </Segment>
-    );
-  }
-
   render() {
-    const { token } = this.props;
+    const { token, article } = this.props;
     return (
       <Layout>
         <h1>Approve token transfer</h1>
-        <h3>Token address: {token.address}</h3>
-        {this.renderArticleRelated()}
-        <Form>
-          <Form.Field>
-            <label>Recipient address</label>
-            <Input
-              value={this.state.recipient}
-              onChange={event => this.setState({ recipient: event.target.value })}
-            />
-          </Form.Field>
+        <p>Approve your account some amount of allowance (ERC20 tokens) to be retrieved by your recipient</p>
+        <Segment raised>
+          <AddressLabel basic color='blue' icon='gem' name='Token address' address={token.address} style={{ marginBottom: 10, marginRight: 10 }} />
+          {!token.symbol && !token.name ?
+            <TokenLabel style={{ marginBottom: 10 }} />
+            :
+            <AddressLabel basic color='green' icon='check' name='Verified' address={token.symbol + ' | ' + token.name} style={{ marginBottom: 10 }} />
+          }
+          <br />
+          <AddressLabel icon='ethereum' name='Your account' address={this.state.account} style={{ marginBottom: 10 }} />
+          <br />
+          <AddressLabel icon='gift' name='Article reward recipient' address={article.rewardRecipient} style={{ marginBottom: 10 }} />
+
+          <Card.Group itemsPerRow={2}>
+            <Card>
+              <Card.Content>
+                <Grid columns='equal' textAlign='center' style={{ height: '100%' }}>
+                  <Grid.Column style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Statistic label='Balance' value={this.state.balance || 0} />
+                  </Grid.Column>
+                  <Grid.Column style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Statistic label='Approved' value={this.state.approvedAmount || 0} />
+                  </Grid.Column>
+                  <Grid.Column style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Statistic label='To approve' value={this.state.amountToApprove || 0} />
+                  </Grid.Column>
+                </Grid>
+              </Card.Content>
+            </Card>
+            <ArticleAbstractCard {...article} fluid />
+          </Card.Group>
+
+        </Segment>
+        <Form onSubmit={this.approve}>
           <Form.Field>
             <label>Amount to approve</label>
             <Input
+              type='number'
+              min='0'
               label='token(s)'
               labelPosition='right'
               value={this.state.amountToApprove}
               onChange={event => this.setState({ amountToApprove: event.target.value })}
             />
           </Form.Field>
+          <Button primary>Approve</Button>
         </Form>
-        <div>Approved amount: {this.state.approvedAmount}</div>
-        <Button primary onClick={() => this.approve()}>Approve</Button>
       </Layout>
     );
   }
 }
-
-const styles = {
-  bodyAbstract: {
-    marginTop: 10,
-    overflowWrap: 'break-word',
-    maxHeight: 192,
-    lineHeight: '24px',
-    overflowY: 'hidden',
-  },
-};

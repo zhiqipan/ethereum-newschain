@@ -7,6 +7,7 @@ import web3 from '../../ethereum/utils/web3';
 import { PicksContext } from '../../client/context/picks';
 import loadArticleDetail from '../../client/utils/loadArticleDetail';
 import Article from '../../client/components/Article';
+import AddressLabel from '../../client/components/AddressLabel';
 
 export default class ArticleDetailPage extends Component {
   static contextType = PicksContext;
@@ -68,18 +69,9 @@ export default class ArticleDetailPage extends Component {
             <Grid.Column width={10}>
               <h1>Article</h1>
               <div>
-                <Label style={{ margin: 0, marginBottom: 10 }}>
-                  <Icon name='copyright' style={{ width: 11 }} /><span style={{ userSelect: 'none' }}>Creator address</span>
-                  <Label.Detail style={{ fontFamily: 'monospace' }}>{creator}</Label.Detail>
-                </Label>
-                <Label style={{ margin: 0, marginBottom: 10 }}>
-                  <Icon name='ethereum' style={{ width: 11 }} /><span style={{ userSelect: 'none' }}>Contract address</span>
-                  <Label.Detail style={{ fontFamily: 'monospace' }}>{address}</Label.Detail>
-                </Label>
-                <Label style={{ margin: 0, marginBottom: 10 }}>
-                  <Icon name='slack hash' style={{ width: 11 }} /><span style={{ userSelect: 'none' }}>Swarm hash</span>
-                  <Label.Detail style={{ fontFamily: 'monospace' }}>{contentHash}</Label.Detail>
-                </Label>
+                <AddressLabel icon='copyright' name='Creator address' address={creator} style={{ marginBottom: 10 }} />
+                <AddressLabel icon='ethereum' name='Contract address' address={address} style={{ marginBottom: 10 }} />
+                <AddressLabel icon='slack hash' name='Swarm hash' address={contentHash} style={{ marginBottom: 10 }} />
               </div>
             </Grid.Column>
             <Grid.Column width={6}>
