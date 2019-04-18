@@ -3,6 +3,8 @@ pragma solidity ^0.5.7;
 import './Article.sol';
 
 contract ERC20Interface {
+  function name() public view returns (string memory);
+  function symbol() public view returns (string memory);
   function totalSupply() public view returns (uint);
   function balanceOf(address tokenOwner) public view returns (uint balance);
   function transfer(address to, uint tokens) public returns (bool success);
@@ -16,8 +18,8 @@ contract ERC20Interface {
 }
 
 contract NcToken is ERC20Interface {
-  string public name = "NewsChain Token";
-  string public symbol = "NCT";
+  string private _name = "NewsChain Token";
+  string private _symbol = "NCT";
   uint public decimals = 0;
 
   uint public supply;
@@ -33,6 +35,14 @@ contract NcToken is ERC20Interface {
     founder = msg.sender;
     // supply = 10000;
     // balances[founder] = 10000;
+  }
+
+  function name() public view returns(string memory) {
+    return _name;
+  }
+
+  function symbol() public view returns(string memory) {
+    return _symbol;
   }
 
   function allowance(address tokenOwner, address spender) view public returns(uint) {

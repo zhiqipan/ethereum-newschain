@@ -9,3 +9,5 @@ const instance = new web3.eth.Contract(
 );
 
 export default instance;
+
+export const tokenAddress = address;
