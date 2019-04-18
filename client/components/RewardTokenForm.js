@@ -6,6 +6,7 @@ import getArticle from '../../ethereum/instances/article';
 import getERC20 from '../../ethereum/instances/erc20';
 import { tokenAddress as nctAddress } from '../../ethereum/instances/token';
 import TokenLabel from './TokenLabel';
+import isValidAddress from '../utils/isValidAddress';
 
 export default class RewardTokenForm extends Component {
   static defaultProps = {
@@ -51,7 +52,7 @@ export default class RewardTokenForm extends Component {
 
   updateERC20Name = async () => {
     const { tokenAddress } = this.state;
-    if (!tokenAddress || tokenAddress.length !== 42) {
+    if (isValidAddress(tokenAddress)) {
       this.setState({ tokenName: '', tokenSymbol: '' });
       return;
     }
@@ -69,7 +70,7 @@ export default class RewardTokenForm extends Component {
   updateApprovedAmount = async () => {
     const { tokenAddress, transferFrom } = this.state;
     const { rewardRecipient } = this.props;
-    if (!tokenAddress || !rewardRecipient || !transferFrom || tokenAddress.length !== 42 || rewardRecipient.length !== 42 || transferFrom.length !== 42) {
+    if (!isValidAddress(tokenAddress) || !isValidAddress(rewardRecipient) || !isValidAddress(transferFrom)) {
       this.setState({ approvedAmount: null });
       return;
     }
