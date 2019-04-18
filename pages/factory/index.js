@@ -62,12 +62,12 @@ export default class FactoryIndexPage extends Component {
           />}
           {menuActive === 'cap' &&
           <FactoryChangeForm
-            admin={admin} label='Citation cap' method='setAutoTokenRewardCitationCap' initialValue={autoTokenRewardCitationCap}
+            admin={admin} label='Citation cap' method='setAutoTokenRewardCitationCap' initialValue={autoTokenRewardCitationCap} type='number' min='0'
             description='Reward only grants to those articles meet the cap! Gain more influence and citations to claim the reward!'
           />}
           {menuActive === 'amount' &&
           <FactoryChangeForm
-            admin={admin} label='Reward amount (NCT)' method='setAutoTokenRewardAmount' initialValue={autoTokenRewardAmount}
+            admin={admin} label='Reward amount (NCT)' method='setAutoTokenRewardAmount' initialValue={autoTokenRewardAmount} type='number' min='0'
             description='The amount of tokens rewarded to each article. Note that each article can only be rewarded once.'
           />}
         </div>
@@ -86,7 +86,7 @@ class FactoryChangeForm extends Component {
   };
 
   render() {
-    const { admin, label, description, isRadio, method } = this.props;
+    const { admin, label, description, isRadio, method, initialValue: _, ...restProps } = this.props;
     const { transacting, error, warning, success, value } = this.state;
 
     return (
@@ -117,11 +117,11 @@ class FactoryChangeForm extends Component {
               <label>{label}</label>
               {isRadio ?
                 <Radio toggle disabled={transacting} checked={value} onChange={() => this.setState({ value: !value })} /> :
-                <Input disabled={transacting} value={value} onChange={e => this.setState({ value: e.target.value })} />
+                <Input {...restProps} disabled={transacting} value={value} onChange={e => this.setState({ value: e.target.value })} />
               }
               <p>{description}</p>
             </Form.Field>
-            <Button secondary disable={transacting} loading={transacting}>Change</Button>
+            <Button secondary disabled={transacting} loading={transacting}>Change</Button>
             <Message error header='Oops...' content={error} />
             <Message warning header='Warning' content={warning} />
             <Message positive hidden={!success} header='Change confirmed' />
