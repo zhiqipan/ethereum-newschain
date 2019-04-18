@@ -64,7 +64,7 @@ export default class RewardTokenForm extends Component {
       const symbol = await erc20.methods.symbol().call();
       this.setState({ tokenName: name, tokenSymbol: symbol });
     } catch (e) {
-
+      console.warn(e);
     }
   };
 
