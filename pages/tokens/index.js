@@ -131,7 +131,7 @@ export default class TokensIndexPage extends Component {
         <h1>ERC20 Token Management</h1>
         <Card fluid>
           <Card.Content>
-            <AddressLabel basic color='blue' icon='gem' name='Token address' address={tokenAddress} style={{ marginBottom: 10 }} />
+            <AddressLabel color='blue' icon='gem' name='Token address' address={tokenAddress} style={{ marginBottom: 10 }} />
             <br />
             <TokenLabel symbol={symbol} name={name} style={{ marginBottom: 10 }} />
             <Grid columns='equal' textAlign='center' style={{ height: 250 }}>
