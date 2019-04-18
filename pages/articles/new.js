@@ -73,7 +73,7 @@ export default class ArticleNewPage extends Component {
               </Label>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <HtmlViewer style={{ height: 96, lineHeight: '24px' }} html={body.replace(/<img[^>]*>/g, '')} />
+              <HtmlViewer style={{ height: 96, lineHeight: '24px', overflow: 'hidden' }} html={body.replace(/<img[^>]*>/g, '')} />
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
                   <Link route={`/articles/${addr}`}><a>View article</a></Link>
