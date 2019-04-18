@@ -53,7 +53,7 @@ export default class TokenApprovePage extends Component {
     await erc20.methods
       .approve(this.props.article.rewardRecipient, amountToApprove)
       .send({ from: account });
-    this.setState({ approvedAmount: this.state.approvedAmount + amountToApprove });
+    this.setState({ approvedAmount: parseFloat(amountToApprove), amountToApprove: 0 });
   };
 
   render() {
@@ -85,18 +85,18 @@ export default class TokenApprovePage extends Component {
                     <Statistic label='Approved' value={this.state.approvedAmount || 0} />
                   </Grid.Column>
                   <Grid.Column style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Statistic label='To approve' value={this.state.amountToApprove || 0} />
+                    <Statistic label='After transfer' value={this.state.balance - this.state.approvedAmount} />
                   </Grid.Column>
                 </Grid>
               </Card.Content>
             </Card>
-            <ArticleAbstractCard {...article} fluid />
+            <ArticleAbstractCard {...article} />
           </Card.Group>
 
         </Segment>
         <Form onSubmit={this.approve}>
           <Form.Field>
-            <label>Amount to approve</label>
+            <label>Amount to (re)approve</label>
             <Input
               type='number'
               min='0'

@@ -97,7 +97,7 @@ export default class RewardTokenForm extends Component {
     this.setState({ transacting: true, errorMessage: null });
     try {
       await this.confirmTransfer();
-      this.setState({ approvedAmount: this.state.approvedAmount - this.state.tokenAmount });
+      this.setState({ approvedAmount: this.state.approvedAmount - this.state.tokenAmount, tokenAmount: 1 });
       if (process.browser) {
         this.setState({ showSuccessMessage: true }, () => {
           setTimeout(() => this.setState({ showSuccessMessage: false }), 3000);
@@ -139,6 +139,8 @@ export default class RewardTokenForm extends Component {
         <Form.Field>
           <label>Amount to reward</label>
           <Input
+            type='number'
+            min='0'
             label='token(s)'
             labelPosition='right'
             value={tokenAmount}
@@ -156,10 +158,10 @@ export default class RewardTokenForm extends Component {
           <p>Please approve your transfer first according to the standard procedure</p>
           {!isNaN(parseFloat(approvedAmount)) &&
           <div>
-            <p style={{ color: approvedAmount >= tokenAmount ? 'inherit' : '#db2828' }}>
+            <p style={{ color: (approvedAmount - tokenAmount >= 0) ? 'inherit' : '#db2828' }}>
               Approved amount: {approvedAmount}
             </p>
-            {approvedAmount < tokenAmount &&
+            {(tokenAmount - approvedAmount) > 0 &&
             <Link route={`/tokens/${tokenAddress}/approve/${this.props.address}`}>
               <Button secondary content='Go approve' />
             </Link>
