@@ -49,7 +49,7 @@ export default class ArticleDetailPage extends Component {
   }
 
   render() {
-    const { address, contentHash, title, body, citations, citedBy, rewardValue, version, creator, rewardRecipient, autoTokenRewarded } = this.props;
+    const { address, contentHash, title, body, citations, citedBy, rewardValue, version, creator, rewardRecipient, autoTokenRewarded, ncTokenReward } = this.props;
     const picked = this.context.articles[address];
     const payload = {
       contentHash,
@@ -58,6 +58,7 @@ export default class ArticleDetailPage extends Component {
       citations,
       citedBy,
       rewardValueEther: web3.utils.fromWei(rewardValue.toString(), 'ether'),
+      ncTokenReward,
     };
 
     return (

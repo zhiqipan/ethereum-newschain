@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import dynamic from 'next/dynamic';
-import { Button, Card, Form, Input, TextArea, Message, Divider, Label, Icon } from 'semantic-ui-react';
+import { Button, Card, Form, Input, Message, Divider } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
 import web3 from '../../ethereum/utils/web3';
 import factory from '../../ethereum/instances/factory';
 import { Router, Link } from '../../routes';
 import { putToSwarm } from '../../client/utils/swarm';
 import { PicksContext } from '../../client/context/picks';
-import HtmlViewer from '../../client/components/HtmlViewer';
+import ArticleAbstractCard from '../../client/components/ArticleAbstractCard';
 
 const MarkdownEditor = process.browser ? dynamic(() => {
   return import('../../client/components/MarkdownEditor' /* webpackChunkName: 'MarkdownEditor' */);
@@ -51,50 +51,27 @@ export default class ArticleNewPage extends Component {
 
     if (Object.keys(articles).length === 0) return <p>No citation</p>;
 
-    const items = Object.keys(articles).map(addr => {
-      const { contentHash, title, body, citations = [], citedBy = [], rewardValueEther } = articles[addr];
-      return {
-        header: title,
-        meta: addr,
-        description: (
-          <div>
-            <div style={{ margin: '10px 0' }}>
-              <Label color='blue'>
-                <Icon name='list' />
-                {citations.length.toString()} citations
-              </Label>
-              <Label color='teal'>
-                <Icon name='code branch' />
-                <span>cited by {citedBy.length.toString()} articles</span>
-              </Label>
-              <Label color='yellow'>
-                <Icon name='ethereum' />
-                <span>{rewardValueEther.toString()} ether reward</span>
-              </Label>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <HtmlViewer style={{ height: 96, lineHeight: '24px', overflow: 'hidden' }} html={body.replace(/<img[^>]*>/g, '')} />
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div>
-                  <Link route={`/articles/${addr}`}><a>View article</a></Link>
-                  <p><a target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>Permalink</a></p>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                  <a style={this.state.transacting ? { color: 'lightgray', cursor: 'default' } : {}} onClick={() => {
-                    if (this.state.transacting) return;
-                    this.context.unpick(addr);
-                  }}>Unpick</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        ),
-        fluid: false,
-        style: { overflowWrap: 'break-word' },
-      };
-    });
-
-    return <Card.Group itemsPerRow={2} items={items} />;
+    return (
+      <Card.Group itemsPerRow={2}>
+        {Object.keys(articles).map(addr => {
+          return (
+            <ArticleAbstractCard
+              {...articles[addr]}
+              key={addr}
+              address={addr}
+              fluid={false}
+              style={{ overflowWrap: 'break-word' }}
+              renderCornerButton={() => {
+                return (
+                  <a style={this.state.transacting ? { color: 'lightgray', cursor: 'default' } : {}}
+                     onClick={() => !this.state.transacting && this.context.unpick(addr)}>Unpick</a>
+                );
+              }}
+            />
+          );
+        })}
+      </Card.Group>
+    );
   }
 
   render() {
