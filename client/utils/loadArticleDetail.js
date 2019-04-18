@@ -1,3 +1,4 @@
+import tokenAddress from '../../ethereum/config/token.address';
 import getArticle from '../../ethereum/instances/article';
 import { getFromSwarm } from './swarm';
 
@@ -12,6 +13,7 @@ function translateSummary(original) {
     'rewardValue',
     'rewardTimes',
     'tokenTypes',
+    'autoTokenRewarded',
   ];
   const result = {};
   summaryMap.forEach((name, index) => {
@@ -23,7 +25,8 @@ function translateSummary(original) {
 
 export default async function loadArticleDetail(address) {
   const summary = translateSummary(await getArticle(address).methods.getSummary().call());
+  const ncTokenReward = await getArticle(address).methods.tokenRewardValue(tokenAddress).call();
   const { title, body } = JSON.parse(await getFromSwarm(summary.contentHash));
 
-  return { ...summary, title, body };
+  return { ...summary, title, body, ncTokenReward };
 }
