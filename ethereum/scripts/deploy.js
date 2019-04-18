@@ -26,9 +26,13 @@ async function deploy(abi, bytecode, arguments = []) {
 const compiledToken = require('../build/NcToken');
 const compiledFactory = require('../build/ArticleFactory');
 
-async function run() {
+async function run(factoryOptions = {}) {
+  const { enableAutoReward = true, citationCap = 1, amount = 3 } = factoryOptions;
   const tokenAddress = await deploy(compiledToken.abi, compiledToken.evm.bytecode.object);
-  const factoryAddress = await deploy(compiledFactory.abi, compiledFactory.evm.bytecode.object, [false, 0, 0, tokenAddress]);  // (bool enableReward, uint citationCap, uint amount, address rewardFrom)
+  const factoryAddress = await deploy(
+    compiledFactory.abi,
+    compiledFactory.evm.bytecode.object,
+    [enableAutoReward, citationCap, amount, tokenAddress]); // (bool enableReward, uint citationCap, uint amount, address rewardFrom)
 
   const tokenPath = path.resolve(__dirname, '..', 'config', 'token.address.json');
   const factoryPath = path.resolve(__dirname, '..', 'config', 'factory.address.json');
