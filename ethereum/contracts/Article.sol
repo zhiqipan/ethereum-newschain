@@ -149,15 +149,15 @@ contract Article {
     emit Rewarded(msg.sender, msg.value);
   }
 
-  function rewardToken(address tokenAddress, uint tokens) public {
+  function rewardToken(address tokenAddress, address from, uint tokens) public {
     if (tokenRewardTimes[tokenAddress] == 0) {
       tokenTypes.push(tokenAddress); // add to tokenTypes if first time to donate such token
     }
     tokenDonatorRecord[msg.sender][tokenAddress] += tokens;
     tokenRewardTimes[tokenAddress] += 1;
     tokenRewardValue[tokenAddress] += tokens;
-    ERC20Interface(tokenAddress).transferFrom(msg.sender, rewardRecipient, tokens); // should be approved first
-    emit TokenRewarded(msg.sender, tokenAddress, tokens);
+    ERC20Interface(tokenAddress).transferFrom(from, rewardRecipient, tokens); // should be approved first
+    emit TokenRewarded(from, tokenAddress, tokens);
   }
 
   function addCitations(address[] memory others) public creatorOnly {
