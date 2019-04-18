@@ -78,6 +78,7 @@ contract Article {
 
   address[] public tokenTypes;
   mapping(address => uint) public tokenRewardTimes;
+  mapping(address => uint) public tokenRewardValue;
   mapping(address => mapping(address => uint)) public tokenDonatorRecord;
 
   address[] public citations;
@@ -153,6 +154,7 @@ contract Article {
     }
     tokenDonatorRecord[msg.sender][tokenAddress] += tokens;
     tokenRewardTimes[tokenAddress] += 1;
+    tokenRewardValue[tokenAddress] += tokens;
     ERC20Interface(tokenAddress).transferFrom(msg.sender, rewardRecipient, tokens); // should be approved first
     emit TokenRewarded(msg.sender, tokenAddress, tokens);
   }
@@ -204,6 +206,7 @@ contract Article {
         }
         tokenDonatorRecord[factoryAddress][tokenAddr] += tokenAmt;
         tokenRewardTimes[tokenAddr] += 1;
+        tokenRewardValue[tokenAddr] += tokenAmt;
         autoTokenRewarded = true;
         emit TokenRewarded(factoryAddress, tokenAddr, tokenAmt);
       }
