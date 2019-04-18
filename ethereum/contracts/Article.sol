@@ -109,7 +109,7 @@ contract Article {
   }
 
   function getSummary() public view returns
-  (bytes32, uint, address, address, address[] memory, address[] memory, uint, uint, address[] memory) {
+  (bytes32, uint, address, address, address[] memory, address[] memory, uint, uint, address[] memory, bool) {
     return (
     contentHash,
     version,
@@ -119,7 +119,8 @@ contract Article {
     citedBy,
     rewardValue,
     rewardTimes,
-    tokenTypes
+    tokenTypes,
+    autoTokenRewarded
     );
   }
 
