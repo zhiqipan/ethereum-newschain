@@ -6,6 +6,7 @@ import getERC20 from '../../ethereum/instances/erc20';
 import { Button, Card, Form, Grid, Menu, Message, Statistic } from 'semantic-ui-react';
 import TokenLabel from '../../client/components/TokenLabel';
 import AddressLabel from '../../client/components/AddressLabel';
+import { isValidAddress, isValidAmount } from '../../client/utils/validate';
 
 export default class TokensIndexPage extends Component {
 
@@ -17,22 +18,28 @@ export default class TokensIndexPage extends Component {
     symbol: '',
     menuActive: 'transfer',
     transferFormRecipient: '',
-    transferFormAmount: 0,
+    transferFormAmount: '',
     approveFormSpender: '',
-    approveFormAmount: 0,
+    approveFormAmount: '',
     spendFormFrom: '',
     spendFormTo: '',
-    spendFormAmount: 0,
+    spendFormAmount: '',
     transacting: false,
+    warningMessage: '',
     errorMessage: '',
     showSuccessMessage: false,
   };
 
   reload = async () => {
+    const { tokenAddress: addr } = this.state;
+    if (!isValidAddress(addr)) {
+      return null;
+    }
+
     const account = (await web3.eth.getAccounts())[0];
-    const balance = await getERC20(this.state.tokenAddress).methods.balanceOf(account).call();
-    const name = await getERC20(this.state.tokenAddress).methods.name().call();
-    const symbol = await getERC20(this.state.tokenAddress).methods.symbol().call();
+    const balance = await getERC20(addr).methods.balanceOf(account).call();
+    const name = await getERC20(addr).methods.name().call();
+    const symbol = await getERC20(addr).methods.symbol().call();
     this.setState({ account, balance, name, symbol });
   };
 
@@ -43,14 +50,22 @@ export default class TokensIndexPage extends Component {
   }
 
   transfer = async () => {
-    const { transferFormRecipient: to, transferFormAmount: amount, tokenAddress, account } = this.state;
-    if (isNaN(parseInt(amount)) || amount <= 0) {
+    const { transferFormRecipient: to, tokenAddress, account } = this.state;
+    const amount = parseInt(this.state.transferFormAmount);
+    if (!isValidAmount(amount) || !isValidAddress(to) || !isValidAddress(tokenAddress)) {
       return null;
     }
-    this.setState({ transacting: true, errorMessage: '' });
+
+    const balance = parseInt(await getERC20(tokenAddress).methods.balanceOf(account).call());
+    console.log({ balance, amount }, typeof balance, typeof amount);
+    if (balance < amount) {
+      this.setState({ warningMessage: `Insufficient balance: ${balance} only, while you're transferring ${amount}` });
+    }
+
+    this.setState({ transacting: true, errorMessage: '', warningMessage: '' });
     try {
       await getERC20(tokenAddress).methods.transfer(to, amount).send({ from: account });
-      this.setState({ transferFormRecipient: '', transferFormAmount: 0 });
+      this.setState({ transferFormRecipient: '', transferFormAmount: '' });
       if (process.browser) {
         this.setState({ showSuccessMessage: true }, () => {
           setTimeout(() => this.setState({ showSuccessMessage: false }), 3000);
@@ -65,14 +80,21 @@ export default class TokensIndexPage extends Component {
   };
 
   approve = async () => {
-    const { approveFormSpender: spender, approveFormAmount: amount, tokenAddress, account } = this.state;
-    if (isNaN(parseInt(amount)) || amount <= 0) {
+    const { approveFormSpender: spender, tokenAddress, account } = this.state;
+    const amount = parseInt(this.state.approveFormAmount);
+    if (!isValidAmount(amount) || !isValidAddress(spender) || !isValidAddress(tokenAddress)) {
       return null;
     }
-    this.setState({ transacting: true, errorMessage: '' });
+
+    const balance = parseInt(await getERC20(tokenAddress).methods.balanceOf(account).call());
+    if (balance < amount) {
+      this.setState({ warningMessage: `Insufficient balance: ${balance} only, while you're approving ${amount}` });
+    }
+
+    this.setState({ transacting: true, errorMessage: '', warningMessage: '' });
     try {
       await getERC20(tokenAddress).methods.approve(spender, amount).send({ from: account });
-      this.setState({ approveFormSpender: '', approveFormAmount: 0 });
+      this.setState({ approveFormSpender: '', approveFormAmount: '' });
       if (process.browser) {
         this.setState({ showSuccessMessage: true }, () => {
           setTimeout(() => this.setState({ showSuccessMessage: false }), 3000);
@@ -87,14 +109,21 @@ export default class TokensIndexPage extends Component {
   };
 
   spend = async () => {
-    const { spendFormFrom: from, spendFormTo: to, spendFormAmount: amount, tokenAddress, account } = this.state;
-    if (isNaN(parseInt(amount)) || amount <= 0) {
+    const { spendFormFrom: from, spendFormTo: to, tokenAddress, account } = this.state;
+    const amount = parseInt(this.state.spendFormAmount);
+    if (!isValidAmount(amount) || !isValidAddress(from) || !isValidAddress(to) || !isValidAddress(tokenAddress)) {
       return null;
     }
-    this.setState({ transacting: true, errorMessage: '' });
+
+    const allowance = parseInt(await getERC20(tokenAddress).methods.allowance(from, to).call());
+    if (allowance < amount) {
+      this.setState({ warningMessage: `Insufficient allowance: ${allowance} only, while you're spending ${amount}` });
+    }
+
+    this.setState({ transacting: true, errorMessage: '', warningMessage: '' });
     try {
       await getERC20(tokenAddress).methods.transferFrom(from, to, amount).send({ from: account });
-      this.setState({ spendFormFrom: '', spendFormTo: '', spendFormAmount: 0 });
+      this.setState({ spendFormFrom: '', spendFormTo: '', spendFormAmount: '' });
       if (process.browser) {
         this.setState({ showSuccessMessage: true }, () => {
           setTimeout(() => this.setState({ showSuccessMessage: false }), 3000);
@@ -109,17 +138,20 @@ export default class TokensIndexPage extends Component {
   };
 
   renderTransferForm() {
-    const { transacting, errorMessage, showSuccessMessage, transferFormRecipient, transferFormAmount } = this.state;
+    const { transacting, errorMessage, showSuccessMessage, warningMessage, transferFormRecipient, transferFormAmount } = this.state;
     return (
       <Grid>
         <Grid.Column width={6} textAlign='left'>
-          <Form error={!!errorMessage} onSubmit={this.transfer}>
+          <Form error={!!errorMessage} warning={!!warningMessage} onSubmit={this.transfer}>
             <Form.Field label='Recipient address' control='input' value={transferFormRecipient}
                         onChange={event => this.setState({ transferFormRecipient: event.target.value })} />
             <Form.Field label='Token amount' control='input' type='number' min='0' value={transferFormAmount}
                         onChange={event => this.setState({ transferFormAmount: event.target.value })} />
-            <Button negative floated='right' loading={transacting} disabled={transacting}>Transfer</Button>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button negative floated='right' loading={transacting} disabled={transacting}>Transfer</Button>
+            </div>
             <Message error header='Oops...' content={errorMessage} />
+            <Message warning header='Warning' content={warningMessage} />
             <Message positive hidden={!showSuccessMessage} header='Successful' content='Tx completed: Token transferred' />
           </Form>
         </Grid.Column>
@@ -128,17 +160,20 @@ export default class TokensIndexPage extends Component {
   }
 
   renderApproveForm() {
-    const { transacting, errorMessage, showSuccessMessage, approveFormSpender, approveFormAmount } = this.state;
+    const { transacting, errorMessage, warningMessage, showSuccessMessage, approveFormSpender, approveFormAmount } = this.state;
     return (
       <Grid>
         <Grid.Column width={6} textAlign='left'>
-          <Form error={!!errorMessage} onSubmit={this.approve}>
+          <Form error={!!errorMessage} warning={!!warningMessage} onSubmit={this.approve}>
             <Form.Field label='Spender address' control='input' value={approveFormSpender}
                         onChange={event => this.setState({ approveFormSpender: event.target.value })} />
             <Form.Field label='Token amount' control='input' type='number' min='0' value={approveFormAmount}
                         onChange={event => this.setState({ approveFormAmount: event.target.value })} />
-            <Button negative floated='right' loading={transacting} disabled={transacting}>Approve</Button>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button negative floated='right' loading={transacting} disabled={transacting}>Approve</Button>
+            </div>
             <Message error header='Oops...' content={errorMessage} />
+            <Message warning header='Warning' content={warningMessage} />
             <Message positive hidden={!showSuccessMessage} header='Successful' content='Tx completed: Spending approved' />
           </Form>
         </Grid.Column>
@@ -147,19 +182,22 @@ export default class TokensIndexPage extends Component {
   }
 
   renderSpendForm() {
-    const { transacting, errorMessage, showSuccessMessage, spendFormFrom, spendFormTo, spendFormAmount } = this.state;
+    const { transacting, errorMessage, warningMessage, showSuccessMessage, spendFormFrom, spendFormTo, spendFormAmount } = this.state;
     return (
       <Grid>
         <Grid.Column width={6} textAlign='left'>
-          <Form error={!!errorMessage} onSubmit={this.spend}>
+          <Form error={!!errorMessage} warning={!!warningMessage} onSubmit={this.spend}>
             <Form.Field label='From address' control='input' value={spendFormFrom}
                         onChange={event => this.setState({ spendFormFrom: event.target.value })} />
             <Form.Field label='To address' control='input' value={spendFormTo}
                         onChange={event => this.setState({ spendFormTo: event.target.value })} />
             <Form.Field label='Token amount' control='input' type='number' min='0' value={spendFormAmount}
                         onChange={event => this.setState({ spendFormAmount: event.target.value })} />
-            <Button secondary floated='right' loading={transacting} disabled={transacting}>Spend</Button>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button secondary loading={transacting} disabled={transacting}>Spend</Button>
+            </div>
             <Message error header='Oops...' content={errorMessage} />
+            <Message warning header='Warning' content={warningMessage} />
             <Message positive hidden={!showSuccessMessage} header='Successful' content='Tx completed: Spending confirmed' />
           </Form>
         </Grid.Column>

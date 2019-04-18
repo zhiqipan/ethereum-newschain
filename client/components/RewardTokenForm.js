@@ -6,7 +6,7 @@ import getArticle from '../../ethereum/instances/article';
 import getERC20 from '../../ethereum/instances/erc20';
 import { tokenAddress as nctAddress } from '../../ethereum/instances/token';
 import TokenLabel from './TokenLabel';
-import isValidAddress from '../utils/isValidAddress';
+import { isValidAddress } from '../utils/validate';
 
 export default class RewardTokenForm extends Component {
   static defaultProps = {
