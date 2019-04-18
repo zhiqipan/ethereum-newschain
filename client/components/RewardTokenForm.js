@@ -53,7 +53,7 @@ export default class RewardTokenForm extends Component {
 
   updateERC20Name = async () => {
     const { tokenAddress } = this.state;
-    if (isValidAddress(tokenAddress)) {
+    if (!isValidAddress(tokenAddress)) {
       this.setState({ tokenName: '', tokenSymbol: '' });
       return;
     }

@@ -126,7 +126,6 @@ export default class TokensIndexPage extends Component {
 
   render() {
     const { account, name, symbol, tokenAddress, menuActive } = this.state;
-    const isRecognizable = !!(name || symbol);
     return (
       <Layout>
         <h1>ERC20 Token Management</h1>
@@ -134,12 +133,7 @@ export default class TokensIndexPage extends Component {
           <Card.Content>
             <AddressLabel basic color='blue' icon='gem' name='Token address' address={tokenAddress} style={{ marginBottom: 10 }} />
             <br />
-            {isRecognizable &&
-            <AddressLabel basic color='green' icon='check' name='Verified' address={symbol + ' | ' + name} style={{ marginBottom: 10 }} />
-            }
-            {!isRecognizable &&
-            <TokenLabel style={{ marginBottom: 10 }} />
-            }
+            <TokenLabel symbol={symbol} name={name} style={{ marginBottom: 10 }} />
             <Grid columns='equal' textAlign='center' style={{ height: 250 }}>
               <Grid.Column style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
                 <Statistic label='Account Balance' value={this.state.balance || 0} size='huge' />
