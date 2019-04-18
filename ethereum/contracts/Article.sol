@@ -45,6 +45,7 @@ contract ArticleFactory {
       Article a = Article(_citations[i]);
       a.addCitedBy(newArticle);
     }
+    emit ArticleCreated(newArticle);
   }
 
   function getArticles() public view returns (address[] memory) {
@@ -55,6 +56,8 @@ contract ArticleFactory {
     require(msg.sender == admin);
     _;
   }
+
+  event ArticleCreated(address newArticle);
 }
 
 /**
@@ -101,6 +104,7 @@ contract Article {
     history[version] = contentHash;
     contentHash = newHash;
     version += 1;
+    emit Modified(newHash, version);
   }
 
   function getSummary() public view returns
@@ -140,6 +144,7 @@ contract Article {
     rewardValue += msg.value;
     rewardTimes += 1;
     rewardRecipient.transfer(msg.value);
+    emit Rewarded(msg.sender, msg.value);
   }
 
   function rewardToken(address tokenAddress, uint tokens) public {
@@ -149,6 +154,7 @@ contract Article {
     tokenDonatorRecord[msg.sender][tokenAddress] += tokens;
     tokenRewardTimes[tokenAddress] += 1;
     ERC20Interface(tokenAddress).transferFrom(msg.sender, rewardRecipient, tokens); // should be approved first
+    emit TokenRewarded(msg.sender, tokenAddress, tokens);
   }
 
   function addCitations(address[] memory others) public creatorOnly {
@@ -169,31 +175,39 @@ contract Article {
     require(article.isArticle()); // should be sent from an article
     citedBy.push(msg.sender);
 
-    if (!autoTokenRewarded) {
-      ArticleFactory factory = ArticleFactory(factoryAddress);
-      if (factory.enableAutoTokenReward() && citedBy.length >= factory.autoTokenRewardCitationCap()) {
-        NcToken(factory.autoTokenRewardFrom()).generateAutoRewardToArticle(factory.autoTokenRewardAmount());
-        autoTokenRewarded = true;
-      }
-    }
+    emit Cited(msg.sender);
+    checkAndGenerateAutoReward();
   }
 
   function addCitedBy(address other) external {
     require(msg.sender == factoryAddress);
     citedBy.push(other);
 
-    if (!autoTokenRewarded) {
-      ArticleFactory factory = ArticleFactory(factoryAddress);
-      if (factory.enableAutoTokenReward() && citedBy.length >= factory.autoTokenRewardCitationCap()) {
-        NcToken(factory.autoTokenRewardFrom()).generateAutoRewardToArticle(factory.autoTokenRewardAmount());
-        autoTokenRewarded = true;
-      }
-    }
+    emit Cited(other);
+    checkAndGenerateAutoReward();
   }
 
   function changeRewardRecipient(address payable newRewardRecipient) public {
     require(msg.sender == creator || msg.sender == rewardRecipient);
     rewardRecipient = newRewardRecipient;
+  }
+
+  function checkAndGenerateAutoReward() private {
+    if (!autoTokenRewarded) {
+      ArticleFactory factory = ArticleFactory(factoryAddress);
+      address tokenAddr = factory.autoTokenRewardFrom();
+      uint tokenAmt = factory.autoTokenRewardAmount();
+      if (factory.enableAutoTokenReward() && citedBy.length >= factory.autoTokenRewardCitationCap()) {
+        NcToken(tokenAddr).generateAutoRewardToArticle(tokenAmt);
+        if (tokenRewardTimes[tokenAddr] == 0) {
+          tokenTypes.push(tokenAddr); // add to tokenTypes if first time to donate such token
+        }
+        tokenDonatorRecord[factoryAddress][tokenAddr] += tokenAmt;
+        tokenRewardTimes[tokenAddr] += 1;
+        autoTokenRewarded = true;
+        emit TokenRewarded(factoryAddress, tokenAddr, tokenAmt);
+      }
+    }
   }
 
   //   function() external payable {
@@ -204,4 +218,9 @@ contract Article {
     require(msg.sender == creator);
     _;
   }
+
+  event Cited(address otherArticle);
+  event Modified(bytes32 newContentHash, uint newVersion);
+  event Rewarded(address donatorAddress, uint amount);
+  event TokenRewarded(address donatorAddress, address tokenAddress, uint tokenAmount);
 }
