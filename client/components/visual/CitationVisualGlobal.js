@@ -1,19 +1,21 @@
 import React, { Component } from 'react';
 import { makeWidthFlexible, Sankey } from 'react-vis';
-import loadData, { recompute } from '../../visual/loadData';
+import { loadDataGlobal, recomputeGlobal } from '../../visual/dataProcessor';
 import { Button, Card, Radio, Segment } from 'semantic-ui-react';
 import loadArticleDetail from '../../utils/loadArticleDetail';
-import { loadArticleDetail as loadFakeDetail } from '../../visual/fixtures';
+import { loadArticleDetail as __loadFakeDetail } from '../../visual/fixtures';
 import ArticleAbstractCard from '../ArticleAbstractCard';
 import AddressLabel from '../AddressLabel';
 
 const FlexibleSankey = makeWidthFlexible(Sankey);
 
+const MOCK = true;
+
 const LINK_OPACITY = 0.3;
 const HOVER_LINK_OPACITY = 0.6;
 const ACTIVE_LINK_OPACITY = 0.9;
 
-export default class CitationVisual extends Component {
+export default class CitationVisualGlobal extends Component {
   state = {
     hoverLink: null,
     activeLink: null,
@@ -25,11 +27,11 @@ export default class CitationVisual extends Component {
   };
 
   async componentDidMount() {
-    const { nodes, links, articleMap, isolated } = await loadData();
+    const { nodes, links, articleMap, isolated } = await loadDataGlobal();
     this.setState({ nodes, links, articleMap, isolated }, () => {
       Object.keys(articleMap).forEach(async address => { // lazy load
         // const articleDetail = await loadArticleDetail(article.address);
-        const articleDetail = await loadFakeDetail(address);
+        const articleDetail = await (MOCK ? __loadFakeDetail() : loadArticleDetail(address));
         this.setState(state => {
           state.articleMap[address] = { ...state.articleMap[address], ...articleDetail };
           return { articleMap: { ...state.articleMap } };
@@ -47,7 +49,7 @@ export default class CitationVisual extends Component {
     const activeTo = activeLink && activeLink.target.address;
 
     return (
-      <>
+      <div>
         <h2>Citation relationship</h2>
         <FlexibleSankey
           height={300}
@@ -105,7 +107,7 @@ export default class CitationVisual extends Component {
                       const map = state.articleMap;
                       map[address].hidden = !map[address].hidden;
                       const selectedArticles = Object.keys(map).filter(address => !map[address].hidden).map(address => map[address]);
-                      const { nodes, links } = recompute(selectedArticles);
+                      const { nodes, links } = recomputeGlobal(selectedArticles);
                       const existedAddresses = nodes.map(node => node.address);
                       Object.keys(map).forEach(address => {
                         if (!existedAddresses.includes(address)) {
@@ -154,7 +156,7 @@ export default class CitationVisual extends Component {
           })}
         </Segment>
         }
-      </>
+      </div>
     );
   }
 }

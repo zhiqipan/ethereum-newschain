@@ -1,18 +1,28 @@
-import { articles as fake } from './fixtures';
+import { article as fakeArticle, articles as fakeArticles } from './fixtures';
 import factory from '../../ethereum/instances/factory';
 import { loadArticleSummary } from '../utils/loadArticleDetail';
 
-function loadFake() {
-  return fake;
+const MOCK = true;
+
+function __loadFakeGlobal() {
+  return fakeArticles;
 }
 
-async function loadReal() {
+function __loadFakeSingle() {
+  return fakeArticle;
+}
+
+async function loadGlobal() {
   const articleAddresses = await factory.methods.getArticles().call();
   const promises = articleAddresses.map(address => loadArticleSummary(address).then(summary => ({ address, ...summary })));
   return await Promise.all(promises);
 }
 
-export function recompute(inputArticles) {
+async function loadSingle(address) {
+  return await loadArticleSummary(address);
+}
+
+export function recomputeGlobal(inputArticles) {
   const inputAddresses = inputArticles.map(a => a.address);
   const hasCommon = (array) => array.filter(addr => inputAddresses.includes(addr)).length > 0;
   const isolated = inputArticles.filter(a => !hasCommon(a.citedBy) && !hasCommon(a.citations));
@@ -44,7 +54,38 @@ export function recompute(inputArticles) {
   return { nodes, links, articleMap, isolated };
 }
 
-export default async function loadData() {
-  const articles = await loadFake();
-  return recompute(articles);
+export async function loadDataGlobal() {
+  const articles = await (MOCK ? __loadFakeGlobal() : loadGlobal());
+  return recomputeGlobal(articles);
+}
+
+export async function loadDataSingle(address, { hasCitations = true, hasCitedBy = true } = {}) {
+  const article = await (MOCK ? __loadFakeSingle() : loadSingle(address));
+  const nodes = [address, ...article.citations, ...article.citedBy].map(addr => {
+    return { name: addr.substr(2, 8), address: addr };
+  });
+
+  const links = [];
+
+  if (hasCitations) {
+    article.citations.forEach(addr => {
+      links.push({
+        source: nodes.map(n => n.address).indexOf(addr),
+        target: 0,
+        value: 10,
+      });
+    });
+  }
+
+  if (hasCitedBy) {
+    article.citedBy.forEach(addr => {
+      links.push({
+        source: 0,
+        target: nodes.map(n => n.address).indexOf(addr),
+        value: 10,
+      });
+    });
+  }
+
+  return { nodes, links };
 }

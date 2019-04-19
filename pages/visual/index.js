@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Card } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
-import CitationVisual from '../../client/components/visual/CitationVisual';
+import CitationVisualGlobal from '../../client/components/visual/CitationVisualGlobal';
+import CitationVisualSingle from '../../client/components/visual/CitationVisualSingle';
 
 export default class Header extends Component {
   render() {
@@ -9,7 +10,8 @@ export default class Header extends Component {
       <Layout>
         <Card fluid>
           <Card.Content>
-            <CitationVisual />
+            {/*<CitationVisualGlobal />*/}
+            <CitationVisualSingle />
           </Card.Content>
         </Card>
       </Layout>

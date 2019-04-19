@@ -34,7 +34,7 @@ cite(a9, a3);
 
 const articles = [a1, a2, a3, a4, a5, a6, a7, a8, a9];
 
-function loadArticleDetail(address) {
+function loadArticleDetail() {
   return {
     contentHash: '7378f4d2919c27f0a49eb691f712bd14ebddcda3518e5372392078e6db6d343d',
     version: 0,
@@ -50,4 +50,6 @@ function loadArticleDetail(address) {
   };
 }
 
-export { articles, loadArticleDetail };
+const article = { ...fakeArticle(0), citations: ['0xA1', '0xA2', '0xA4'], citedBy: ['0xA6', '0xA8'] };
+
+export { article, articles, loadArticleDetail };
