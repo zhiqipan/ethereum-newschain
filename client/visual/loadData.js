@@ -18,29 +18,30 @@ export function recompute(inputArticles) {
   const isolated = inputArticles.filter(a => !hasCommon(a.citedBy) && !hasCommon(a.citations));
   const articles = inputArticles.filter(a => hasCommon(a.citedBy) || hasCommon(a.citations));
   const articleMap = {};
-  articles.forEach((a, index) => {
-    articleMap[a.address] = { ...a, index };
+  articles.forEach(a => {
+    const { address } = a;
+    articleMap[address] = { ...a, displayName: address.substr(2, 8) };
   });
 
-  const nodes = articles.map(a => {
-    return { name: a.address, address: a.address };
+  const nodes = Object.keys(articleMap).map(address => {
+    return { name: address.substr(2, 8), address };
   });
 
   const links = [];
 
-  articles.forEach((a, i) => {
-    a.citedBy.forEach(other => {
+  Object.keys(articleMap).forEach((address, i) => {
+    articleMap[address].citedBy.forEach(other => {
       if (articleMap[other]) {
         links.push({
           source: i,
-          target: articleMap[other].index,
+          target: articles.map(a => a.address).indexOf(other),
           value: 10,
         });
       }
     });
   });
 
-  return { nodes, links, articles, articleMap, isolated };
+  return { nodes, links, articleMap, isolated };
 }
 
 export default async function loadData() {

@@ -19,26 +19,26 @@ export default class CitationVisual extends Component {
 
     nodes: [],
     links: [],
-    articles: [],
     articleMap: {},
     isolated: [],
   };
 
   async componentDidMount() {
-    const { nodes, links, articles, articleMap, isolated } = await loadData();
-    articles.forEach(async article => { // lazy load
-      // const articleDetail = await loadArticleDetail(article.address);
-      const articleDetail = await loadFakeDetail(article.address);
-      this.setState(state => {
-        state.articleMap[article.address] = { ...state.articleMap[article.address], ...articleDetail };
-        return { articleMap: { ...state.articleMap } };
+    const { nodes, links, articleMap, isolated } = await loadData();
+    this.setState({ nodes, links, articleMap, isolated }, () => {
+      Object.keys(articleMap).forEach(async address => { // lazy load
+        // const articleDetail = await loadArticleDetail(article.address);
+        const articleDetail = await loadFakeDetail(address);
+        this.setState(state => {
+          state.articleMap[address] = { ...state.articleMap[address], ...articleDetail };
+          return { articleMap: { ...state.articleMap } };
+        });
       });
     });
-    this.setState({ nodes, links, articles, articleMap, isolated });
   }
 
   render() {
-    const { nodes, links, hoverLink, activeLink, articles, articleMap, isolated } = this.state;
+    const { nodes, links, hoverLink, activeLink, articleMap, isolated } = this.state;
 
     const hoverFrom = hoverLink && hoverLink.source.address;
     const hoverTo = hoverLink && hoverLink.target.address;
@@ -59,31 +59,14 @@ export default class CitationVisual extends Component {
           })}
           onLinkMouseOver={hoverLink => this.setState({ hoverLink })}
           onLinkMouseOut={() => this.setState({ hoverLink: null })}
-          onLinkClick={activeLink => this.setState({ activeLink })}
+          onLinkClick={activeLink => {
+            if (this.state.activeLink && this.state.activeLink.index === activeLink.index) {
+              this.setState({ activeLink: null });
+            } else {
+              this.setState({ activeLink });
+            }
+          }}
         />
-        <div>
-          {articles.map((a, index) => {
-            return (
-              <Radio key={a.address} label={a.address} style={{ display: 'block' }} checked={!a.hidden} onClick={() => {
-                this.setState(state => {
-                  state.articles[index].hidden = !state.articles[index].hidden;
-                  const { nodes, links } = recompute(state.articles.filter(a => !a.hidden));
-                  return { nodes, links, articles: [...state.articles] }; // do not update articleMap and isolated
-                });
-              }} />
-            );
-          })}
-        </div>
-        {isolated.length > 0 &&
-        <Segment>
-          <h3>The following {isolated.length} articles are isolated:</h3>
-          {isolated.map(a => {
-            return (
-              <p key={a.address}>{a.address}</p>
-            );
-          })}
-        </Segment>
-        }
         <Segment style={{ height: 100 }}>
           {hoverLink &&
           <>
@@ -93,7 +76,7 @@ export default class CitationVisual extends Component {
           </>
           }
           {!hoverLink &&
-            <p>Hover to see more</p>
+          <p>Hover to see more</p>
           }
         </Segment>
         {activeLink &&
@@ -101,6 +84,43 @@ export default class CitationVisual extends Component {
           <ArticleAbstractCard {...articleMap[activeFrom]} address={activeFrom} style={{ overflowWrap: 'break-word' }} />
           <ArticleAbstractCard {...articleMap[activeTo]} address={activeTo} style={{ overflowWrap: 'break-word' }} />
         </Card.Group>
+        }
+        <Segment>
+          {Object.keys(articleMap).map(address => {
+            const article = articleMap[address];
+            return (
+              <div>
+                <Radio key={address} label={article.displayName} style={{ padding: 10 }} checked={!article.hidden} onClick={() => {
+                  this.setState(state => {
+                    const map = state.articleMap;
+                    map[address].hidden = !map[address].hidden;
+                    const selectedArticles = Object.keys(map).filter(address => !map[address].hidden).map(address => map[address]);
+                    const { nodes, links } = recompute(selectedArticles);
+                    const existedAddresses = nodes.map(node => node.address);
+                    Object.keys(map).forEach(address => {
+                      if (!existedAddresses.includes(address)) {
+                        map[address].hidden = true;
+                      }
+                    });
+                    return { nodes, links, articleMap: { ...map }, activeLink: null }; // do not update articleMap and isolated from the result of recompute()
+                  });
+                }} />
+                <div>
+
+                </div>
+              </div>
+            );
+          })}
+        </Segment>
+        {isolated.length > 0 &&
+        <Segment>
+          <h3>The following {isolated.length} articles are isolated:</h3>
+          {isolated.map(a => {
+            return (
+              <p key={a.address}>{a.address}</p>
+            );
+          })}
+        </Segment>
         }
       </>
     );

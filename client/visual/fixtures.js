@@ -1,6 +1,6 @@
 function fakeArticle(num) {
   return {
-    address: '0xA' + num,
+    address: '0xA' + num + Math.random().toString().substr(2, 38),
     citations: [],
     citedBy: [],
     contentHash: '7378f4d2919c27f0a49eb691f712bd14ebddcda3518e5372392078e6db6d343d',
