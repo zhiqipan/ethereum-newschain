@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Grid, Menu, Icon, Label } from 'semantic-ui-react';
 import HtmlViewer from './HtmlViewer';
+import { Link } from '../../routes';
 
 export default class Article extends Component {
   static defaultProps = {
@@ -40,15 +41,19 @@ export default class Article extends Component {
                 Etherscan
               </Menu.Item>
               {(typeof window !== 'object' || window.location.pathname.replace(/\/$/, '') !== `/articles/${address}/history`) &&
-              <Menu.Item href={`/articles/${address}/history`}>
-                <Icon size='large' color='grey' name='history' />
-                History
-              </Menu.Item>
+              <Link route={`/articles/${address}/history`}>
+                <a className='item'>
+                  <Icon size='large' color='grey' name='history' />
+                  History
+                </a>
+              </Link>
               }
-              <Menu.Item href={`/visual/${address}?tab=streamline`}>
-                <Icon size='large' color='grey' name='map outline' style={{ transform: 'rotate(90deg)' }} />
-                Streamline
-              </Menu.Item>
+              <Link route={`/visual/${address}?tab=streamline`}>
+                <a className='item'>
+                  <Icon size='large' color='grey' name='map outline' style={{ transform: 'rotate(90deg)' }} />
+                  Streamline
+                </a>
+              </Link>
             </Menu>
           </Column>
         </Row>

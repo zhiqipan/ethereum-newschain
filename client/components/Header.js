@@ -8,16 +8,19 @@ export default class Header extends Component {
   };
 
   render() {
+    // do NOT use menu item with href (e.g. <Menu.Item href='/articles/new'>+</Menu.Item>),
+    // this reloads the page and react context will be lost,
+    // while link with route will handle this elegantly
     return (
       <Menu>
-        <Menu.Item href='/' style={{ color: '#f2711c' }}>NewsChain</Menu.Item>
-        <Menu.Item href='/articles'>Articles</Menu.Item>
-        <Menu.Item href='/tokens'>Tokens</Menu.Item>
-        <Menu.Item href='/factory'>Factory</Menu.Item>
-        <Menu.Item href='/visual'>Visual</Menu.Item>
+        <Link route='/'><a className='item' style={{ color: '#f2711c' }}>NewsChain</a></Link>
+        <Link route='/articles'><a className='item'>Articles</a></Link>
+        <Link route='/tokens'><a className='item'>Tokens</a></Link>
+        <Link route='/factory'><a className='item'>Factory</a></Link>
+        <Link route='/visual'><a className='item'>Visual</a></Link>
 
         <Menu.Menu position='right'>
-          <Menu.Item href='/articles/new'>+</Menu.Item>
+          <Link route='/articles/new'><a className="item">+</a></Link>
         </Menu.Menu>
       </Menu>
     );
