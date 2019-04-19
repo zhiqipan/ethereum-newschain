@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { makeWidthFlexible, Sankey } from 'react-vis';
 import loadData, { recompute } from '../../visual/loadData';
-import { Card, Radio, Segment } from 'semantic-ui-react';
+import { Button, Card, Radio, Segment } from 'semantic-ui-react';
 import loadArticleDetail from '../../utils/loadArticleDetail';
 import { loadArticleDetail as loadFakeDetail } from '../../visual/fixtures';
 import ArticleAbstractCard from '../ArticleAbstractCard';
+import AddressLabel from '../AddressLabel';
 
 const FlexibleSankey = makeWidthFlexible(Sankey);
 
@@ -67,16 +68,21 @@ export default class CitationVisual extends Component {
             }
           }}
         />
-        <Segment style={{ height: 100 }}>
+        <Segment style={{ height: 95 }}>
           {hoverLink &&
           <>
-            <p>Article {hoverLink.source.name} is cited by {hoverLink.target.name}</p>
-            <p>From: {hoverFrom}</p>
-            <p>To: {hoverTo}</p>
+            <div style={{ marginBottom: 10 }}>
+              <AddressLabel color='brown' icon='ethereum' name='original' basic address={hoverFrom} />&nbsp;&nbsp;
+              <b>{articleMap[hoverFrom].title}</b>
+            </div>
+            <div>
+              <AddressLabel color='orange' icon='ethereum' name='derived' basic address={hoverTo} />&nbsp;&nbsp;
+              <b>{articleMap[hoverFrom].title}</b>
+            </div>
           </>
           }
           {!hoverLink &&
-          <p>Hover to see more</p>
+          <h3 style={{ color: 'gray' }}>Hover to see more</h3>
           }
         </Segment>
         {activeLink &&
@@ -86,35 +92,61 @@ export default class CitationVisual extends Component {
         </Card.Group>
         }
         <Segment>
-          {Object.keys(articleMap).map(address => {
-            const article = articleMap[address];
-            return (
-              <div>
-                <Radio key={address} label={article.displayName} style={{ padding: 10 }} checked={!article.hidden} onClick={() => {
-                  this.setState(state => {
-                    const map = state.articleMap;
-                    map[address].hidden = !map[address].hidden;
-                    const selectedArticles = Object.keys(map).filter(address => !map[address].hidden).map(address => map[address]);
-                    const { nodes, links } = recompute(selectedArticles);
-                    const existedAddresses = nodes.map(node => node.address);
-                    Object.keys(map).forEach(address => {
-                      if (!existedAddresses.includes(address)) {
-                        map[address].hidden = true;
-                      }
+          <div style={{ display: 'grid', gridTemplateColumns: '33% 33% 33%' }}>
+            {Object.keys(articleMap).map(address => {
+              const article = articleMap[address];
+              const activeButton = activeFrom === address || activeTo === address;
+              const greyButton = article.isolated;
+              return (
+                <div style={{ marginBottom: 15, whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                  <Button color={activeButton && 'orange'} basic={!activeButton} compact size='small'
+                          inverted={greyButton} onClick={() => {
+                    this.setState(state => {
+                      const map = state.articleMap;
+                      map[address].hidden = !map[address].hidden;
+                      const selectedArticles = Object.keys(map).filter(address => !map[address].hidden).map(address => map[address]);
+                      const { nodes, links } = recompute(selectedArticles);
+                      const existedAddresses = nodes.map(node => node.address);
+                      Object.keys(map).forEach(address => {
+                        if (!existedAddresses.includes(address)) {
+                          map[address].isolated = true;
+                        } else {
+                          map[address].isolated = false;
+                        }
+                      });
+                      // do not update articleMap and isolated from the result of recompute()
+                      return { nodes, links, articleMap: { ...map }, activeLink: null };
                     });
-                    return { nodes, links, articleMap: { ...map }, activeLink: null }; // do not update articleMap and isolated from the result of recompute()
-                  });
-                }} />
-                <div>
-
+                  }}>
+                    <Radio key={address} checked={!article.hidden} label={article.displayName} />
+                  </Button>
+                  <span style={{
+                    display: 'inline-block',
+                    fontSize: 15,
+                    lineHeight: '15px',
+                    height: 15,
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    marginLeft: 5,
+                    width: 'calc(100% - 150px)',
+                  }}>{article.title}</span>
+                  <div style={{ color: 'gray', overflow: 'hidden', whiteSpace: 'nowrap', marginRight: 10, marginTop: 5 }}>
+                    <p style={{
+                      fontSize: 13,
+                      lineHeight: '13px',
+                      height: 13,
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                    }}>{article.body}</p>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </Segment>
         {isolated.length > 0 &&
         <Segment>
-          <h3>The following {isolated.length} articles are isolated:</h3>
+          <h3>The following {isolated.length} articles are completely isolated:</h3>
           {isolated.map(a => {
             return (
               <p key={a.address}>{a.address}</p>
