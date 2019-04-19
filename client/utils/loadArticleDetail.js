@@ -27,10 +27,25 @@ export async function loadArticleSummary(address) {
   return translateSummary(await getArticle(address).methods.getSummary().call());
 }
 
-export default async function loadArticleDetail(address) {
+export default async function loadArticleDetail(address, populate = false) {
   const summary = translateSummary(await getArticle(address).methods.getSummary().call());
   const ncTokenReward = await getArticle(address).methods.tokenRewardValue(tokenAddress).call();
   const { title, body } = JSON.parse(await getFromSwarm(summary.contentHash));
 
-  return { ...summary, title, body, ncTokenReward };
+  const result = { ...summary, title, body, ncTokenReward };
+
+  if (populate) {
+    const citationsMap = {};
+    const citedByMap = {};
+    await Promise.all(summary.citations.map(address => {
+      return loadArticleDetail(address).then(detail => citationsMap[address] = detail);
+    }));
+    await Promise.all(summary.citedBy.map(address => {
+      return loadArticleDetail(address).then(detail => citedByMap[address] = detail);
+    }));
+    result.citationsMap = citationsMap;
+    result.citedByMap = citedByMap;
+  }
+
+  return result;
 }

@@ -34,8 +34,8 @@ cite(a9, a3);
 
 const articles = [a1, a2, a3, a4, a5, a6, a7, a8, a9];
 
-function loadArticleDetail() {
-  return {
+function loadArticleDetail(address, populate) {
+  const result = {
     contentHash: '7378f4d2919c27f0a49eb691f712bd14ebddcda3518e5372392078e6db6d343d',
     version: 0,
     creator: '0x30010ba49019D79869be3518Ce3f9F2a6a866BC3',
@@ -48,6 +48,13 @@ function loadArticleDetail() {
     body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. A debitis delectus ducimus laboriosam laborum recusandae reiciendis sapiente totam ut. Distinctio dolorum et maxime molestiae, non nulla quibusdam tempora veniam vitae.',
     ncTokenReward: 3,
   };
+  if (populate) {
+    result.citedBy = [];
+    result.citations = [];
+    result.citedByMap = {};
+    result.citationsMap = {};
+  }
+  return result;
 }
 
 const article = { ...fakeArticle(0), citations: ['0xA1', '0xA2', '0xA4'], citedBy: ['0xA6', '0xA8'] };

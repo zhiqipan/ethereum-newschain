@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { makeWidthFlexible, Sankey } from 'react-vis';
 import { loadDataSingle } from '../../visual/dataProcessor';
-import { Card, Segment } from 'semantic-ui-react';
+import { Card, Icon, Segment } from 'semantic-ui-react';
 import AddressLabel from '../AddressLabel';
 import ArticleAbstractCard from '../ArticleAbstractCard';
-import { loadArticleDetail as __loadFakeDetail, loadArticleDetail as loadFakeDetail } from '../../visual/fixtures';
+import { loadArticleDetail as __loadFakeDetail } from '../../visual/fixtures';
 import loadArticleDetail from '../../utils/loadArticleDetail';
 
 const FlexibleSankey = makeWidthFlexible(Sankey);
@@ -15,56 +15,90 @@ const LINK_OPACITY = 0.3;
 const HOVER_LINK_OPACITY = 0.6;
 const ACTIVE_LINK_OPACITY = 0.9;
 
+function getColorByPos(pos) {
+  let color = '#f2711c';
+  if (pos === 'left') color = '#fbbd08';
+  if (pos === 'right') color = '#db2828';
+  return color;
+}
+
 export default class CitationVisualSingle extends Component {
   static defaultProps = {
     address: '0xA0',
+    mode: 'all',
   };
 
   state = {
     hoverLink: null,
     activeLink: null,
+    articlePopulated: null,
     nodes: [],
     links: [],
-    fromArticle: null,
-    toArticle: null,
   };
 
   async componentDidMount() {
-    const { nodes, links } = await loadDataSingle(this.props.address);
-    this.setState({ nodes, links });
+    const { address } = this.props;
+    const { nodes, links } = await loadDataSingle(address);
+    const articlePopulated = await (MOCK ? __loadFakeDetail(address, true) : loadArticleDetail(address, true));
+    this.setState({ nodes, links, articlePopulated });
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if (prevState.activeLink !== this.state.activeLink) {
-      if (this.state.activeLink) {
-        const fromArticle = await (MOCK ? __loadFakeDetail() : loadArticleDetail(this.state.activeLink.source));
-        const toArticle = await (MOCK ? __loadFakeDetail() : loadArticleDetail(this.state.activeLink.target));
-        this.setState({ fromArticle, toArticle });
-      } else {
-        this.setState({ fromArticle: null, toArticle: null });
-      }
+    if (prevProps.mode !== this.props.mode) {
+      const { address, mode } = this.props;
+      const { nodes, links } = await loadDataSingle(address, { hasCitations: mode !== 'citedBy', hasCitedBy: mode !== 'citations' });
+      this.setState({ nodes, links, hoverLink: null, activeLink: null, fromArticle: null, toArticle: null });
     }
   }
 
-  render() {
-    const { nodes, links, hoverLink, activeLink, fromArticle, toArticle } = this.state;
+  renderOtherArticle(activeLink) {
+    if (!activeLink) return null;
+    const { articlePopulated } = this.state;
+    const isCitedByOther = activeLink.source.address === this.props.address;
+    const otherAddress = isCitedByOther ? activeLink.target.address : activeLink.source.address;
+    const otherArticle = isCitedByOther ? articlePopulated.citedByMap[otherAddress] : articlePopulated.citationsMap[otherAddress];
 
-    const hoverFrom = hoverLink && hoverLink.source.address;
-    const hoverTo = hoverLink && hoverLink.target.address;
-    const activeFrom = activeLink && activeLink.source.address;
-    const activeTo = activeLink && activeLink.target.address;
+    function renderArrow(pointDown) {
+      const style = pointDown ? { transform: 'scaleY(-1) rotate(-90deg)' } : {};
+      const name = pointDown ? 'level down alternative' : 'level up alternative';
+
+      return (
+        <Card style={{ width: 200 }}>
+          <Card.Content style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Icon size='massive' style={style} name={name} />
+          </Card.Content>
+        </Card>
+      );
+    }
+
+    return (
+      <Card.Group itemsPerRow={2}>
+        {isCitedByOther && renderArrow(true)}
+        <ArticleAbstractCard {...otherArticle} address={otherAddress} style={{ overflowWrap: 'break-word', width: 'calc(100% - 256px)' }} />
+        {!isCitedByOther && renderArrow(false)}
+      </Card.Group>
+    );
+  }
+
+  render() {
+    const { nodes, links, hoverLink, activeLink, articlePopulated } = this.state;
 
     return (
       <div>
         <h2>Citation relationship</h2>
         <FlexibleSankey
           height={300}
-          nodes={nodes}
+          nodes={nodes.map((d) => {
+            const color = getColorByPos(d.position);
+            return { ...d, color };
+          })}
           links={links.map((d, i) => {
             let opacity = LINK_OPACITY;
             if (hoverLink && i === hoverLink.index) opacity = HOVER_LINK_OPACITY;
             if (activeLink && i === activeLink.index) opacity = ACTIVE_LINK_OPACITY;
-            return { ...d, opacity };
+            let color = '#f2711c';
+            if (d.target === 0) color = '#fbbd08';
+            return { ...d, opacity, color };
           })}
           onLinkMouseOver={hoverLink => this.setState({ hoverLink })}
           onLinkMouseOut={() => this.setState({ hoverLink: null })}
@@ -76,29 +110,13 @@ export default class CitationVisualSingle extends Component {
             }
           }}
         />
-        <Segment style={{ height: 95 }}>
-          {hoverLink &&
-          <>
-            <div style={{ marginBottom: 10 }}>
-              <AddressLabel color='brown' icon='ethereum' name='original' basic address={hoverFrom} />&nbsp;&nbsp;
-              {/*<b>{articleMap[hoverFrom].title}</b>*/}
-            </div>
-            <div>
-              <AddressLabel color='orange' icon='ethereum' name='derived' basic address={hoverTo} />&nbsp;&nbsp;
-              {/*<b>{articleMap[hoverFrom].title}</b>*/}
-            </div>
-          </>
-          }
-          {!hoverLink &&
-          <h3 style={{ color: 'gray' }}>Hover to see more</h3>
-          }
+        <Segment>
+          <AddressLabel style={{ marginBottom: 10 }} color='black' icon='ethereum' name='Viewing' address={this.props.address} />
+          <Card.Group>
+            <ArticleAbstractCard {...articlePopulated} address={this.props.address} fluid />
+          </Card.Group>
         </Segment>
-        {activeLink &&
-        <Card.Group itemsPerRow={2}>
-          {fromArticle ? <ArticleAbstractCard {...fromArticle} address={activeFrom} style={{ overflowWrap: 'break-word' }} /> : <Card />}
-          {toArticle ? <ArticleAbstractCard {...toArticle} address={activeTo} style={{ overflowWrap: 'break-word' }} /> : <Card />}
-        </Card.Group>
-        }
+        {activeLink && this.renderOtherArticle(activeLink)}
       </div>
     );
   }

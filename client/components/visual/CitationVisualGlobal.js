@@ -74,11 +74,11 @@ export default class CitationVisualGlobal extends Component {
           {hoverLink &&
           <>
             <div style={{ marginBottom: 10 }}>
-              <AddressLabel color='brown' icon='ethereum' name='original' basic address={hoverFrom} />&nbsp;&nbsp;
+              <AddressLabel color='brown' icon='ethereum' name='Original' basic address={hoverFrom} />&nbsp;&nbsp;
               <b>{articleMap[hoverFrom].title}</b>
             </div>
             <div>
-              <AddressLabel color='orange' icon='ethereum' name='derived' basic address={hoverTo} />&nbsp;&nbsp;
+              <AddressLabel color='orange' icon='ethereum' name='Derived' basic address={hoverTo} />&nbsp;&nbsp;
               <b>{articleMap[hoverFrom].title}</b>
             </div>
           </>

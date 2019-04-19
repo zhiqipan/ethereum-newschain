@@ -38,7 +38,7 @@ export default class ArticleNewPage extends Component {
       });
       console.info('Article confirmed on Ethereum:', `block #${result.blockNumber}, transaction ${result.transactionHash}`);
       this.context.unpickAll();
-      await Router.replaceRoute('/');
+      await Router.replaceRoute('/articles');
     } catch (e) {
       console.error(e);
       this.setState({ errorMessage: e.message });

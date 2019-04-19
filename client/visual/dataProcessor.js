@@ -60,15 +60,24 @@ export async function loadDataGlobal() {
 }
 
 export async function loadDataSingle(address, { hasCitations = true, hasCitedBy = true } = {}) {
-  const article = await (MOCK ? __loadFakeSingle() : loadSingle(address));
-  const nodes = [address, ...article.citations, ...article.citedBy].map(addr => {
-    return { name: addr.substr(2, 8), address: addr };
-  });
+  const { citations, citedBy } = await (MOCK ? __loadFakeSingle() : loadSingle(address));
+  const nodes = [];
+  nodes.push({ name: address.substr(2, 8), address, position: 'middle' });
+  if (hasCitations) {
+    citations.forEach(addr => {
+      nodes.push({ name: addr.substr(2, 8), address: addr, position: 'left' });
+    });
+  }
+  if (hasCitedBy) {
+    citedBy.forEach(addr => {
+      nodes.push({ name: addr.substr(2, 8), address: addr, position: 'right' });
+    });
+  }
 
   const links = [];
 
   if (hasCitations) {
-    article.citations.forEach(addr => {
+    citations.forEach(addr => {
       links.push({
         source: nodes.map(n => n.address).indexOf(addr),
         target: 0,
@@ -78,7 +87,7 @@ export async function loadDataSingle(address, { hasCitations = true, hasCitedBy 
   }
 
   if (hasCitedBy) {
-    article.citedBy.forEach(addr => {
+    citedBy.forEach(addr => {
       links.push({
         source: 0,
         target: nodes.map(n => n.address).indexOf(addr),
