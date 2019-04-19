@@ -2,16 +2,16 @@ import React, { Component } from 'react';
 import { Card, Menu } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
 import CitationVisualSingle from '../../client/components/visual/CitationVisualSingle';
-import VisualSingleStreamlinePage from './streamline';
+import ArticleStreamline from '../../client/components/ArticleStreamline';
 
 export default class VisualSinglePage extends Component {
   static getInitialProps(props) {
-    const { address } = props.query;
-    return { address };
+    const { address, tab } = props.query;
+    return { address, tab };
   }
 
   state = {
-    menuActive: 'all',
+    menuActive: this.props.tab || 'all',
   };
 
   render() {
@@ -29,7 +29,7 @@ export default class VisualSinglePage extends Component {
               <Menu.Item name='Streamline view' active={menuActive === 'streamline'} onClick={() => this.setState({ menuActive: 'streamline' })} />
             </Menu>
             {menuActive === 'streamline' ?
-              <VisualSingleStreamlinePage address={address} /> :
+              <ArticleStreamline address={address} /> :
               <CitationVisualSingle address={address} mode={menuActive} />
             }
           </Card.Content>

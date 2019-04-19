@@ -80,36 +80,52 @@ export default class CitationVisualSingle extends Component {
     );
   }
 
+  renderSankey() {
+    const { nodes, links, hoverLink, activeLink } = this.state;
+    return (
+      <FlexibleSankey
+        height={300}
+        nodes={nodes.map((d) => {
+          const color = getColorByPos(d.position);
+          return { ...d, color };
+        })}
+        links={links.map((d, i) => {
+          let opacity = LINK_OPACITY;
+          if (hoverLink && i === hoverLink.index) opacity = HOVER_LINK_OPACITY;
+          if (activeLink && i === activeLink.index) opacity = ACTIVE_LINK_OPACITY;
+          let color = '#f2711c';
+          if (d.target === 0) color = '#fbbd08';
+          return { ...d, opacity, color };
+        })}
+        onLinkMouseOver={hoverLink => this.setState({ hoverLink })}
+        onLinkMouseOut={() => this.setState({ hoverLink: null })}
+        onLinkClick={activeLink => {
+          if (this.state.activeLink && this.state.activeLink.index === activeLink.index) {
+            this.setState({ activeLink: null });
+          } else {
+            this.setState({ activeLink });
+          }
+        }}
+      />
+    );
+  }
+
+  renderEmptySankey() {
+    return (
+      <Segment style={{ height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+        <Icon name='ban' size='huge' />
+        <h3>This is a standalone (isolated) article</h3>
+      </Segment>
+    );
+  }
+
   render() {
-    const { nodes, links, hoverLink, activeLink, articlePopulated } = this.state;
+    const { links, activeLink, articlePopulated } = this.state;
 
     return (
       <div>
         <h2>Citation relationship</h2>
-        <FlexibleSankey
-          height={300}
-          nodes={nodes.map((d) => {
-            const color = getColorByPos(d.position);
-            return { ...d, color };
-          })}
-          links={links.map((d, i) => {
-            let opacity = LINK_OPACITY;
-            if (hoverLink && i === hoverLink.index) opacity = HOVER_LINK_OPACITY;
-            if (activeLink && i === activeLink.index) opacity = ACTIVE_LINK_OPACITY;
-            let color = '#f2711c';
-            if (d.target === 0) color = '#fbbd08';
-            return { ...d, opacity, color };
-          })}
-          onLinkMouseOver={hoverLink => this.setState({ hoverLink })}
-          onLinkMouseOut={() => this.setState({ hoverLink: null })}
-          onLinkClick={activeLink => {
-            if (this.state.activeLink && this.state.activeLink.index === activeLink.index) {
-              this.setState({ activeLink: null });
-            } else {
-              this.setState({ activeLink });
-            }
-          }}
-        />
+        {links.length > 0 ? this.renderSankey() : this.renderEmptySankey()}
         <Segment>
           <AddressLabel style={{ marginBottom: 10 }} color='black' icon='ethereum' name='Viewing' address={this.props.address} />
           <Card.Group>

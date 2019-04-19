@@ -22,7 +22,11 @@ export default class Article extends Component {
         <Row>
           <Column>
             <h2>{title}</h2>
-            {!isNaN(version) && <Label color={inverted ? 'grey' : 'brown'}>{version === 0 ? 'Initial version' : `Modified | version: ${version + 1}`}</Label>}
+            {!isNaN(version) &&
+            <Label color={inverted ? 'grey' : 'brown'}>
+              {version === 0 ? 'Initial version' : `Modified | version: ${version + 1}`}
+            </Label>
+            }
             {autoTokenRewarded && <Label color={inverted ? 'grey' : 'brown'}>NCT auto rewarded</Label>}
           </Column>
           <Column textAlign='right'>
@@ -41,6 +45,10 @@ export default class Article extends Component {
                 History
               </Menu.Item>
               }
+              <Menu.Item href={`/visual/${address}?tab=streamline`}>
+                <Icon size='large' color='grey' name='map outline' style={{ transform: 'rotate(90deg)' }} />
+                Streamline
+              </Menu.Item>
             </Menu>
           </Column>
         </Row>

@@ -2,7 +2,7 @@ import { article as fakeArticle, articles as fakeArticles } from './fixtures';
 import factory from '../../ethereum/instances/factory';
 import { loadArticleSummary } from '../utils/loadArticleDetail';
 
-const MOCK = true;
+const MOCK = false;
 
 function __loadFakeGlobal() {
   return fakeArticles;

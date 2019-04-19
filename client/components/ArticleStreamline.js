@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { loadArticleDetail as __loadFakeDetail } from '../../client/visual/fixtures';
-import loadArticleDetail from '../../client/utils/loadArticleDetail';
+import { loadArticleDetail as __loadFakeDetail } from '../visual/fixtures';
+import loadArticleDetail from '../utils/loadArticleDetail';
 import { Button, Card, Divider, Header, Icon, Loader, Menu, Radio, Segment } from 'semantic-ui-react';
-import Article from '../../client/components/Article';
-import ArticleAbstractCard from '../../client/components/ArticleAbstractCard';
+import Article from './Article';
+import ArticleAbstractCard from './ArticleAbstractCard';
 
 // todo: set env var: https://jaketrent.com/post/environment-variables-in-nextjs
-const MOCK = true;
+const MOCK = false;
 
-export default class VisualSingleStreamlinePage extends Component {
+export default class ArticleStreamline extends Component {
   state = {
     itemsPerRow: 1,
     simplified: true,
@@ -77,15 +77,15 @@ export default class VisualSingleStreamlinePage extends Component {
         </Divider>
         <Card.Group itemsPerRow={itemsPerRow}>
           {Object.keys(citationsMap).map(address => {
-            return <ArticleAbstractCard simple={simplified} key={address} {...citationsMap[address]} />;
+            return <ArticleAbstractCard address={address} simple={simplified} key={address} {...citationsMap[address]} />;
           })}
         </Card.Group>
         <Segment inverted={inverted} raised stacked>
-          <Article {...articlePopulated} inverted={inverted} />
+          <Article {...articlePopulated} address={this.props.address} inverted={inverted} />
         </Segment>
         <Card.Group itemsPerRow={itemsPerRow}>
           {Object.keys(citedByMap).map(address => {
-            return <ArticleAbstractCard simple={simplified} key={address} {...citedByMap[address]} />;
+            return <ArticleAbstractCard address={address} simple={simplified} key={address} {...citedByMap[address]} />;
           })}
         </Card.Group>
       </div>

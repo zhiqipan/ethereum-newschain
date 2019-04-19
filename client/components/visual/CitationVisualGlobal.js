@@ -9,7 +9,7 @@ import AddressLabel from '../AddressLabel';
 
 const FlexibleSankey = makeWidthFlexible(Sankey);
 
-const MOCK = true;
+const MOCK = false;
 
 const LINK_OPACITY = 0.3;
 const HOVER_LINK_OPACITY = 0.6;
