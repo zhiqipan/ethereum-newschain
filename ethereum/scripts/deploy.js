@@ -4,7 +4,7 @@ const HDWalletProvider = require('truffle-hdwallet-provider');
 const Web3 = require('web3');
 
 // load env var (running this script does not require server, so env variables are NOT ready on process.env)
-const { mnemonic, rinkebyAddress } = require('../../config/server.config');
+const { mnemonic, rinkebyAddress } = require('./deploy.config');
 
 // rinkebyAddress is the address of Infura rinkeby network endpoint, use Infura so we don't have to host node on our local machine (which is expensive)
 // mnemonic gives information of our accounts (public key and private key) so web3 can take control of our account
