@@ -4,9 +4,9 @@ import loadArticleDetail from '../utils/loadArticleDetail';
 import { Button, Card, Divider, Header, Icon, Loader, Menu, Radio, Segment } from 'semantic-ui-react';
 import Article from './Article';
 import ArticleAbstractCard from './ArticleAbstractCard';
+import config from '../client.config';
 
-// todo: set env var: https://jaketrent.com/post/environment-variables-in-nextjs
-const MOCK = false;
+const { MOCK } = config;
 
 export default class ArticleStreamline extends Component {
   state = {

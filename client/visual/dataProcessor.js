@@ -1,8 +1,9 @@
 import { article as fakeArticle, articles as fakeArticles } from './fixtures';
 import factory from '../../ethereum/instances/factory';
 import { loadArticleSummary } from '../utils/loadArticleDetail';
+import config from '../client.config';
 
-const MOCK = false;
+const { MOCK } = config;
 
 function __loadFakeGlobal() {
   return fakeArticles;

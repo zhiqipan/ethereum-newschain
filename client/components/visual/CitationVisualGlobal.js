@@ -6,10 +6,11 @@ import loadArticleDetail from '../../utils/loadArticleDetail';
 import { loadArticleDetail as __loadFakeDetail } from '../../visual/fixtures';
 import ArticleAbstractCard from '../ArticleAbstractCard';
 import AddressLabel from '../AddressLabel';
+import config from '../../client.config';
 
 const FlexibleSankey = makeWidthFlexible(Sankey);
 
-const MOCK = false;
+const { MOCK } = config;
 
 const LINK_OPACITY = 0.3;
 const HOVER_LINK_OPACITY = 0.6;

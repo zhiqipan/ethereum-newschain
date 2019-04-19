@@ -2,7 +2,8 @@ node_modules/
 .idea/
 
 ethereum/build
-ethereum/config/config.js
-ethereum/config/*.address.json
 
 .next/
+
+config/server.config.js
+ethereum/scripts/deploy.config.js
