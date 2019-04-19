@@ -23,6 +23,10 @@ function translateSummary(original) {
   return result;
 }
 
+export async function loadArticleSummary(address) {
+  return translateSummary(await getArticle(address).methods.getSummary().call());
+}
+
 export default async function loadArticleDetail(address) {
   const summary = translateSummary(await getArticle(address).methods.getSummary().call());
   const ncTokenReward = await getArticle(address).methods.tokenRewardValue(tokenAddress).call();

@@ -4,6 +4,7 @@ import { Button, Card, Grid, Statistic } from 'semantic-ui-react';
 import { Link } from '../routes';
 import factory from '../ethereum/instances/factory';
 import token from '../ethereum/instances/token';
+import CitationVisual from '../client/components/visual/CitationVisual';
 
 export default class IndexPage extends Component {
 
@@ -41,6 +42,15 @@ export default class IndexPage extends Component {
             <Button color='orange' size='large'>More to discover...</Button>
           </Link>
         </div>
+
+        <Card fluid>
+          <Card.Content>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CitationVisual />
+            </div>
+          </Card.Content>
+        </Card>
+
       </Layout>
     );
   }

@@ -18,6 +18,7 @@
     "next-routes": "^1.4.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-vis": "^1.11.6",
     "semantic-ui-react": "^0.86.0",
     "solc": "0.5.7",
     "swarmgw": "^0.3.1",
