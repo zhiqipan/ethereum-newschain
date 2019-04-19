@@ -49,14 +49,19 @@ function loadArticleDetail(address, populate) {
     ncTokenReward: 3,
   };
   if (populate) {
-    result.citedBy = [];
-    result.citations = [];
-    result.citedByMap = {};
-    result.citationsMap = {};
+    result.citedBy = ['0xB1', '0xB2'];
+    result.citations = ['0xC1'];
+    result.citedByMap = {
+      '0xB1': loadArticleDetail('0xB1', false),
+      '0xB2': loadArticleDetail('0xB2', false),
+    };
+    result.citationsMap = {
+      '0xC1': loadArticleDetail('0xC1', false),
+    };
   }
   return result;
 }
 
-const article = { ...fakeArticle(0), citations: ['0xA1', '0xA2', '0xA4'], citedBy: ['0xA6', '0xA8'] };
+const article = { ...fakeArticle(0), citations: ['0xF1', '0xF2', '0xF4'], citedBy: ['0xF5', '0xF6'] };
 
 export { article, articles, loadArticleDetail };

@@ -10,22 +10,23 @@ export default class Article extends Component {
     body: '',
     version: null,
     autoTokenRewarded: false,
+    inverted: false,
   };
 
   render() {
-    const { address, contentHash, title, body, autoTokenRewarded } = this.props;
+    const { address, contentHash, title, body, autoTokenRewarded, inverted } = this.props;
     const version = parseInt(this.props.version);
     const { Row, Column } = Grid;
     return (
-      <Grid columns='equal'>
+      <Grid inverted={inverted} columns='equal'>
         <Row>
           <Column>
             <h2>{title}</h2>
-            {!isNaN(version) && <Label color='brown'>{version === 0 ? 'Initial version' : `Modified | version: ${version + 1}`}</Label>}
-            {autoTokenRewarded && <Label color='pink'>NCT auto rewarded</Label>}
+            {!isNaN(version) && <Label color={inverted ? 'grey' : 'brown'}>{version === 0 ? 'Initial version' : `Modified | version: ${version + 1}`}</Label>}
+            {autoTokenRewarded && <Label color={inverted ? 'grey' : 'brown'}>NCT auto rewarded</Label>}
           </Column>
           <Column textAlign='right'>
-            <Menu compact borderless secondary icon='labeled'>
+            <Menu inverted={inverted} compact borderless secondary icon='labeled'>
               <Menu.Item target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>
                 <Icon size='large' color='grey' name='linkify' />
                 Permalink

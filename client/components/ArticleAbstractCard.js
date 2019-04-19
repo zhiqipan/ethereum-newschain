@@ -15,11 +15,12 @@ export default class ArticleAbstractCard extends Component {
     rewardValue: 0,
     rewardValueEther: undefined,
     ncTokenReward: 0,
+    simple: false,
     renderCornerButton: () => null,
   };
 
   render() {
-    const { title, body, address, citations, citedBy, contentHash, rewardValue, ncTokenReward, ...otherProps } = this.props;
+    const { title, body, address, citations, citedBy, contentHash, rewardValue, ncTokenReward, simple, ...otherProps } = this.props;
     const rewardValueEther = this.props.rewardValueEther || web3.utils.fromWei(rewardValue.toString(), 'ether');
 
     return (
@@ -32,20 +33,20 @@ export default class ArticleAbstractCard extends Component {
             {address}
           </Card.Meta>
           <div>
-            <div style={{ margin: '10px 0' }}>
-              <Label color='blue'>
+            <div hidden={simple} style={{ margin: '10px 0' }}>
+              <Label color='blue' style={{ margin: '0 3px 5px 0' }}>
                 <Icon name='list' />
                 {citations.length.toString()} citations
               </Label>
-              <Label color='teal'>
+              <Label color='teal' style={{ margin: '0 3px 5px 0' }}>
                 <Icon name='code branch' />
                 <span>cited by {citedBy.length.toString()} articles</span>
               </Label>
-              <Label color='yellow'>
+              <Label color='yellow' style={{ margin: '0 3px 5px 0' }}>
                 <Icon name='ethereum' />
                 <span>{rewardValueEther.toString()} ether reward</span>
               </Label>
-              <Label color='orange'>
+              <Label color='orange' style={{ margin: '0 3px 5px 0' }}>
                 <Icon name='gem' />
                 <span>{ncTokenReward.toString()} NCT tokens</span>
               </Label>

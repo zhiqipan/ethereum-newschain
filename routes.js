@@ -6,6 +6,7 @@ routes
   .add('/articles/:address/modify', '/articles/modify')
   .add('/articles/:address/history', '/articles/history')
   .add('/tokens/:token/approve/:article', '/tokens/approve')
-  .add('/visual/:article', '/visual/single');
+  .add('/visual/:article', '/visual/single')
+  .add('/visual/:article/streamline', '/visual/streamline');
 
 module.exports = routes;

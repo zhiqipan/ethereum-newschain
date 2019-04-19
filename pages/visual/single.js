@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Card, Menu } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
 import CitationVisualSingle from '../../client/components/visual/CitationVisualSingle';
+import VisualSingleStreamlinePage from './streamline';
 
 export default class VisualSinglePage extends Component {
   static getInitialProps(props) {
@@ -25,8 +26,12 @@ export default class VisualSinglePage extends Component {
               <Menu.Item name='All' active={menuActive === 'all'} onClick={() => this.setState({ menuActive: 'all' })} />
               <Menu.Item name='Citations only' active={menuActive === 'citations'} onClick={() => this.setState({ menuActive: 'citations' })} />
               <Menu.Item name='Cited by others only' active={menuActive === 'citedBy'} onClick={() => this.setState({ menuActive: 'citedBy' })} />
+              <Menu.Item name='Streamline view' active={menuActive === 'streamline'} onClick={() => this.setState({ menuActive: 'streamline' })} />
             </Menu>
-            <CitationVisualSingle address={address} mode={menuActive} />
+            {menuActive === 'streamline' ?
+              <VisualSingleStreamlinePage address={address} /> :
+              <CitationVisualSingle address={address} mode={menuActive} />
+            }
           </Card.Content>
         </Card>
       </Layout>
