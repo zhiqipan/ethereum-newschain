@@ -12,10 +12,8 @@ async function loadReal() {
   return await Promise.all(promises);
 }
 
-export default async function loadData() {
-  const articles = await loadFake();
+export function recompute(articles) {
   const articleMap = {};
-
   articles.forEach((a, index) => {
     articleMap[a.address] = { ...a, index };
   });
@@ -28,13 +26,22 @@ export default async function loadData() {
 
   articles.forEach((a, i) => {
     a.citedBy.forEach(other => {
-      links.push({
-        source: i,
-        target: articleMap[other].index,
-        value: 10,
-      });
+      if (articleMap[other]) {
+        links.push({
+          source: i,
+          target: articleMap[other].index,
+          value: 10,
+        });
+      }
     });
   });
 
-  return { nodes, links };
+  return { nodes, links, articleMap };
+}
+
+export default async function loadData() {
+  const articles = await loadFake();
+  const { nodes, links, articleMap } = recompute(articles);
+
+  return { nodes, links, articles, articleMap };
 }
