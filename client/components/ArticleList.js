@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Card, Loader, Pagination } from 'semantic-ui-react';
 import h2p from 'html2plaintext';
+import moment from 'moment';
 import { Link } from '../../routes';
 import loadArticleDetail from '../../client/utils/loadArticleDetail';
 
@@ -62,10 +63,22 @@ export default class ArticleList extends Component {
           };
         }
 
+        const { title, body, subtitle, authorNames, initialPublishTime, lastModifyTime } = article.swarmContent;
+        const timestamp = initialPublishTime || lastModifyTime;
+        const authors = authorNames && authorNames.length > 0 && `Authored by: ${authorNames.join(', ')}`;
+        const time = timestamp && moment(timestamp).format('YYYY-MM-DD');
+
+        const mataContent = [subtitle, authors, time].filter(Boolean);
+
         return {
-          header: article.swarmContent.title,
-          meta: <Link route={this.props.getLink(addr)}><a>View article</a></Link>,
-          description: <p style={styles.bodyAbstract}>{h2p(article.swarmContent.body)}</p>,
+          header: title,
+          meta: mataContent.join('  |  '),
+          description: (
+            <>
+              <Link route={this.props.getLink(addr)}><a>View article</a></Link>
+              <p style={styles.bodyAbstract}>{h2p(body)}</p>
+            </>
+          ),
           fluid: true,
         };
       });
