@@ -63,9 +63,9 @@ export default class ArticleList extends Component {
         }
 
         return {
-          header: article.title,
+          header: article.swarmContent.title,
           meta: <Link route={this.props.getLink(addr)}><a>View article</a></Link>,
-          description: <p style={styles.bodyAbstract}>{h2p(article.body)}</p>,
+          description: <p style={styles.bodyAbstract}>{h2p(article.swarmContent.body)}</p>,
           fluid: true,
         };
       });

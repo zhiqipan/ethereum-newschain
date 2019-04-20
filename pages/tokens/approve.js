@@ -20,8 +20,8 @@ export default class TokenApprovePage extends Component {
 
     const rewardRecipient = await getArticle(articleAddr).methods.rewardRecipient().call();
     const contentHash = await getArticle(articleAddr).methods.contentHash().call();
-    const { title, body } = JSON.parse(await getFromSwarm(contentHash.replace('0x', '')));
-    result.article = { address: articleAddr, rewardRecipient, contentHash, title, body };
+    const swarmContent = JSON.parse(await getFromSwarm(contentHash.replace('0x', '')));
+    result.article = { address: articleAddr, rewardRecipient, contentHash, swarmContent };
 
     const tokenName = await getERC20(tokenAddr).methods.name().call();
     const tokenSymbol = await getERC20(tokenAddr).methods.symbol().call();

@@ -6,8 +6,7 @@ import { Link } from '../../routes';
 
 export default class ArticleAbstractCard extends Component {
   static defaultProps = {
-    title: '',
-    body: '',
+    swarmContent: {},
     address: '',
     citations: [],
     citedBy: [],
@@ -20,7 +19,8 @@ export default class ArticleAbstractCard extends Component {
   };
 
   render() {
-    const { title, body, address, citations, citedBy, contentHash, rewardValue, ncTokenReward, simple, renderCornerButton, ...otherProps } = this.props;
+    const { swarmContent, address, citations, citedBy, contentHash, rewardValue, ncTokenReward, simple, renderCornerButton, ...otherProps } = this.props;
+    const { title, body, subtitle, authorNames } = swarmContent;
     const rewardValueEther = this.props.rewardValueEther || web3.utils.fromWei(rewardValue.toString(), 'ether');
 
     return (
@@ -30,7 +30,8 @@ export default class ArticleAbstractCard extends Component {
             {title}
           </Card.Header>
           <Card.Meta>
-            {address}
+            {subtitle && <p>{subtitle}</p>}
+            {authorNames && authorNames.length > 0 && <p>Authored by: {authorNames.join(', ')}</p>}
           </Card.Meta>
           <div>
             <div hidden={simple} style={{ margin: '10px 0' }}>
@@ -51,12 +52,12 @@ export default class ArticleAbstractCard extends Component {
                 <span>{ncTokenReward.toString()} NCT tokens</span>
               </Label>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginTop: 5}}>
               <p style={{ height: 96, lineHeight: '24px', overflow: 'hidden' }}>{h2p(body)}</p>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
                   <Link route={`/articles/${address}`}><a>View article</a></Link>
-                  <p><a target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>Permalink</a></p>
+                  <p style={{ marginTop: 10 }}><a target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>Permalink</a></p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-end' }}>
                   {renderCornerButton()}

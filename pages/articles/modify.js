@@ -1,17 +1,14 @@
 import React, { Component } from 'react';
-import { Button, Form, Input, TextArea, Message, Loader } from 'semantic-ui-react';
+import { Message, Loader } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
 import web3 from '../../ethereum/utils/web3';
 import { Router, Link } from '../../routes';
-import { getFromSwarm, putToSwarm } from '../../client/utils/swarm';
+import { getFromSwarm } from '../../client/utils/swarm';
 import getArticle from '../../ethereum/instances/article';
-import dynamic from 'next/dynamic';
 import { Context } from '../../client/context/context';
 import { MenuItemEnum } from '../../client/context/menu';
-
-const MarkdownEditor = process.browser ? dynamic(() => {
-  return import('../../client/components/MarkdownEditor' /* webpackChunkName: 'MarkdownEditor' */);
-}) : () => null;
+import ArticleInputForm from '../../client/components/ArticleInputForm';
+import AddressLabel from '../../client/components/AddressLabel';
 
 export default class ArticleModifyPage extends Component {
   static contextType = Context;
@@ -24,71 +21,39 @@ export default class ArticleModifyPage extends Component {
   static defaultProps = {
     address: '',
     contentHash: '',
-    disabled: false,
   };
 
   state = {
-    title: '',
-    body: '',
-    transacting: false,
-    errorMessage: null,
+    loading: true,
+    swarmContent: {},
     isCreator: null,
   };
 
   async componentDidMount() {
     this.context.menu.select(MenuItemEnum.ARTICLES);
 
-    const { title, body } = JSON.parse(await getFromSwarm(this.props.contentHash));
-    this.setState({ title, body });
+    const swarmContent = JSON.parse(await getFromSwarm(this.props.contentHash));
+    this.setState({ swarmContent, loading: false });
 
     const account = (await web3.eth.getAccounts())[0];
     const creator = await getArticle(this.props.address).methods.creator().call();
     this.setState({ isCreator: account.toLowerCase() === creator.toLowerCase() });
   }
 
-  onSubmit = async event => {
-    event.preventDefault();
-    this.setState({ transacting: true, errorMessage: '' });
-
-    try {
-      const { title, body } = this.state;
-      console.info('Publishing article to Swarm...');
-      const hash = await putToSwarm(JSON.stringify({ title, body }));
-      const account = (await web3.eth.getAccounts())[0];
-      console.info('Article published to Swarm:', hash);
-      const result = await getArticle(this.props.address).methods.modify('0x' + hash).send({ from: account });
-      console.info('Article confirmed on Ethereum:', `block #${result.blockNumber}, transaction ${result.transactionHash}`);
-      await Router.replaceRoute(`/articles/${this.props.address}`);
-    } catch (e) {
-      console.error(e);
-      this.setState({ errorMessage: e.message });
-    }
-    this.setState({ transacting: false });
-  };
-
   render() {
     const { address } = this.props;
-    const { title, body, transacting, errorMessage, isCreator } = this.state;
+    const { isCreator, swarmContent, loadingSwarm } = this.state;
+
     return (
       <Layout>
         <h1>Modify an article</h1>
-        <h3 style={{ fontFamily: 'monospace' }}>{address}</h3>
-        <Form error={!!errorMessage} onSubmit={this.onSubmit}>
-          <Form.Field>
-            <label>Title</label>
-            <Input disabled={!isCreator || transacting} value={title} onChange={event => this.setState({ title: event.target.value })} />
-          </Form.Field>
-          <Form.Field>
-            <label>Body</label>
-            <MarkdownEditor disabled={!isCreator || transacting} onChange={html => this.setState({ body: html })} initialHtml={body} />
-          </Form.Field>
-          {isCreator === true &&
-          <React.Fragment>
-            <Button disabled={transacting} primary loading={transacting}>Modify</Button>
-            <Message error header='Oops...' content={errorMessage} />
-          </React.Fragment>
-          }
-        </Form>
+        <AddressLabel basic name='Article address' icon='ethereum' address={address} color='orange' style={{ marginBottom: 20 }} />
+        {!loadingSwarm &&
+        <>
+          <ArticleInputForm address={address} mode='modify' disabled={isCreator === false} initialSwarmContent={swarmContent} />
+        </>
+        }
+        <Loader active={loadingSwarm} />
         {isCreator === false &&
         <Message error header='You are not the creator' content={'Only the creator itself can modify this article'} />
         }

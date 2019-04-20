@@ -1,60 +1,27 @@
 import React, { Component } from 'react';
-import dynamic from 'next/dynamic';
-import { Button, Card, Form, Input, Message, Divider } from 'semantic-ui-react';
+import { Card, Divider, Icon } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
-import web3 from '../../ethereum/utils/web3';
-import factory from '../../ethereum/instances/factory';
 import { Router, Link } from '../../routes';
-import { putToSwarm } from '../../client/utils/swarm';
 import { Context } from '../../client/context/context';
 import ArticleAbstractCard from '../../client/components/ArticleAbstractCard';
 import { MenuItemEnum } from '../../client/context/menu';
-
-const MarkdownEditor = process.browser ? dynamic(() => {
-  return import('../../client/components/MarkdownEditor' /* webpackChunkName: 'MarkdownEditor' */);
-}) : () => null;
+import ArticleInputForm from '../../client/components/ArticleInputForm';
 
 export default class ArticleNewPage extends Component {
   static contextType = Context;
 
   state = {
-    title: '',
-    body: '',
     transacting: false,
-    errorMessage: null,
   };
 
   componentDidMount() {
     this.context.menu.select(MenuItemEnum.ARTICLES);
   }
 
-  onSubmit = async event => {
-    event.preventDefault();
-    this.setState({ transacting: true, errorMessage: '' });
-
-    try {
-      const { title, body } = this.state;
-      console.info('Publishing article to Swarm...');
-      const hash = await putToSwarm(JSON.stringify({ title, body }));
-      const account = (await web3.eth.getAccounts())[0];
-      console.info('Article published to Swarm:', hash);
-      const result = await factory.methods.createArticle('0x' + hash, account, Object.keys(this.context.picks.articles)).send({
-        from: account,
-      });
-      console.info('Article confirmed on Ethereum:', `block #${result.blockNumber}, transaction ${result.transactionHash}`);
-      this.context.picks.unpickAll();
-      await Router.replaceRoute('/articles');
-    } catch (e) {
-      console.error(e);
-      this.setState({ errorMessage: e.message });
-    }
-    this.setState({ transacting: false });
-  };
-
   renderPickedArticles() {
     const { articles } = this.context.picks;
 
-    if (Object.keys(articles).length === 0) return <p>No citation</p>;
+    if (Object.keys(articles).length === 0) return <p>No articles yet</p>;
 
     return (
       <Card.Group itemsPerRow={2}>
@@ -80,24 +47,12 @@ export default class ArticleNewPage extends Component {
   }
 
   render() {
-    const { title, body, transacting, errorMessage } = this.state;
     return (
       <Layout>
         <h1>Publish an article</h1>
-        <Form error={!!errorMessage} onSubmit={this.onSubmit}>
-          <Form.Field>
-            <label>Title</label>
-            <Input disabled={transacting} value={title} onChange={event => this.setState({ title: event.target.value })} />
-          </Form.Field>
-          <Form.Field>
-            <label>Body</label>
-            <MarkdownEditor disabled={transacting} onChange={html => this.setState({ body: html })} initialHtml={body} />
-          </Form.Field>
-          <Button disabled={transacting} primary loading={transacting}>Create</Button>
-          <Message error header='Oops...' content={errorMessage} />
-        </Form>
+        <ArticleInputForm mode='create' onTransacting={(transacting) => this.setState({ transacting })} />
         <Divider />
-        <h3>Citations:</h3>
+        <h3><Icon name='quote left' />Citations / references:</h3>
         {this.renderPickedArticles()}
       </Layout>
     );

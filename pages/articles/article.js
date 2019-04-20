@@ -55,12 +55,11 @@ export default class ArticleDetailPage extends Component {
   }
 
   render() {
-    const { address, contentHash, title, body, citations, citedBy, rewardValue, version, creator, rewardRecipient, autoTokenRewarded, ncTokenReward } = this.props;
+    const { address, contentHash, swarmContent, citations, citedBy, rewardValue, version, creator, rewardRecipient, autoTokenRewarded, ncTokenReward } = this.props;
     const picked = this.context.picks.articles[address];
     const payload = {
       contentHash,
-      title,
-      body,
+      swarmContent,
       citations,
       citedBy,
       rewardValueEther: web3.utils.fromWei(rewardValue.toString(), 'ether'),
@@ -95,8 +94,7 @@ export default class ArticleDetailPage extends Component {
                 <Article
                   address={address}
                   contentHash={contentHash}
-                  title={title}
-                  body={body}
+                  swarmContent={swarmContent}
                   version={version}
                   autoTokenRewarded={autoTokenRewarded}
                 />

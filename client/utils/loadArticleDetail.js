@@ -33,9 +33,9 @@ export async function loadArticleSummary(address) {
 export default async function loadArticleDetail(address, populate = false) {
   const summary = translateSummary(await getArticle(address).methods.getSummary().call());
   const ncTokenReward = await getArticle(address).methods.tokenRewardValue(tokenAddress).call();
-  const { title, body } = JSON.parse(await getFromSwarm(summary.contentHash));
+  const swarmContent = JSON.parse(await getFromSwarm(summary.contentHash));
 
-  const result = { ...summary, title, body, ncTokenReward };
+  const result = { ...summary, swarmContent, ncTokenReward };
 
   if (populate) {
     const citationsMap = {};

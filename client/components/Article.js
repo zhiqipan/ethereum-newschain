@@ -7,15 +7,15 @@ export default class Article extends Component {
   static defaultProps = {
     address: '',
     contentHash: '',
-    title: '',
-    body: '',
+    swarmContent: {},
     version: null,
     autoTokenRewarded: false,
     inverted: false,
   };
 
   render() {
-    const { address, contentHash, title, body, autoTokenRewarded, inverted } = this.props;
+    const { address, contentHash, swarmContent, autoTokenRewarded, inverted } = this.props;
+    const { title, body, subtitle, authorNames, editorNames, geoLocation } = swarmContent;
     const version = parseInt(this.props.version);
     const { Row, Column } = Grid;
     return (
@@ -23,6 +23,7 @@ export default class Article extends Component {
         <Row>
           <Column>
             <h2>{title}</h2>
+            {subtitle && <h3 style={{ fontSize: 16, marginTop: -8, marginLeft: 3 }}>{subtitle}</h3>}
             {!isNaN(version) &&
             <Label color={inverted ? 'grey' : 'brown'}>
               {version === 0 ? 'Initial version' : `Modified | version: ${version + 1}`}
@@ -55,6 +56,15 @@ export default class Article extends Component {
                 </a>
               </Link>
             </Menu>
+          </Column>
+        </Row>
+        <Row>
+          <Column>
+            <div>
+              {authorNames && authorNames.length > 0 && <Label color={inverted ? 'grey' : null}>Authored by: {authorNames.join(', ')}</Label>}
+              {editorNames && editorNames.length > 0 && <Label color={inverted ? 'grey' : null}>Edited by: {editorNames.join(', ')}</Label>}
+              {geoLocation && <Label color={inverted ? 'grey' : null}>From: {geoLocation}</Label>}
+            </div>
           </Column>
         </Row>
         <Row>

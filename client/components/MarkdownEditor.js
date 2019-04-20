@@ -5,6 +5,7 @@ import HtmlViewer from './HtmlViewer';
 // basic demo: https://braft.margox.cn/demos/basic
 export default class MarkdownEditor extends Component {
   static defaultProps = {
+    placeholder: '',
     initialHtml: '',
     onChange: () => null,
     onSave: () => null,
@@ -32,6 +33,7 @@ export default class MarkdownEditor extends Component {
     return (
       <div style={styles.wrapper}>
         <BraftEditor
+          placeholder={this.props.placeholder}
           value={editorState}
           onChange={editorState => {
             this.setState({ editorState });

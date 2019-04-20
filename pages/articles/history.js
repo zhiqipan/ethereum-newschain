@@ -31,9 +31,9 @@ export default class ArticleHistoryPage extends Component {
     this.context.menu.select(MenuItemEnum.ARTICLES);
 
     const { latestHash: contentHash } = this.props;
-    const { title, body } = JSON.parse(await getFromSwarm(contentHash));
+    const swarmContent = JSON.parse(await getFromSwarm(contentHash));
     this.setState(state => {
-      state.versions[this.props.lastVersionNum] = { title, body, contentHash };
+      state.versions[this.props.lastVersionNum] = { swarmContent, contentHash };
       return { versions: state.versions };
     });
   }
@@ -45,9 +45,9 @@ export default class ArticleHistoryPage extends Component {
       const { address } = this.props;
       const { activeVersion } = this.state;
       const contentHash = (await getArticle(address).methods.history(activeVersion).call()).replace('0x', '');
-      const { title, body } = JSON.parse(await getFromSwarm(contentHash));
+      const swarmContent = JSON.parse(await getFromSwarm(contentHash));
       this.setState(state => {
-        state.versions[activeVersion] = { title, body, contentHash };
+        state.versions[activeVersion] = { swarmContent, contentHash };
         return { versions: state.versions };
       });
     }
@@ -65,8 +65,7 @@ export default class ArticleHistoryPage extends Component {
           <Article
             address={this.props.address}
             contentHash={article.contentHash}
-            title={article.title}
-            body={article.body}
+            swarmContent={article.swarmContent}
             version={version}
             hideHistoryMenuItem
           />
