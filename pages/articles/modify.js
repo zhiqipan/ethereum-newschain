@@ -29,15 +29,27 @@ export default class ArticleModifyPage extends Component {
     isCreator: null,
   };
 
-  async componentDidMount() {
-    this.context.menu.select(MenuItemEnum.ARTICLES);
+  init = async () => {
+    this.setState({ swarmContent: {}, loadingSwarm: true });
 
     const swarmContent = JSON.parse(await getFromSwarm(this.props.contentHash));
-    this.setState({ swarmContent, loading: false });
+    this.setState({ swarmContent, loadingSwarm: false });
 
     const account = (await web3.eth.getAccounts())[0];
     const creator = await getArticle(this.props.address).methods.creator().call();
     this.setState({ isCreator: account.toLowerCase() === creator.toLowerCase() });
+  };
+
+  async componentDidMount() {
+    this.context.menu.select(MenuItemEnum.ARTICLES);
+
+    await this.init();
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (prevProps.address !== this.props.address) {
+      await this.init();
+    }
   }
 
   render() {

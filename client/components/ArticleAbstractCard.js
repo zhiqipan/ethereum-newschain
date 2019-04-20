@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Card, Icon, Label } from 'semantic-ui-react';
+import moment from 'moment';
 import h2p from 'html2plaintext';
 import web3 from '../../ethereum/utils/web3';
 import { Link } from '../../routes';
@@ -20,8 +21,15 @@ export default class ArticleAbstractCard extends Component {
 
   render() {
     const { swarmContent, address, citations, citedBy, contentHash, rewardValue, ncTokenReward, simple, renderCornerButton, ...otherProps } = this.props;
-    const { title, body, subtitle, authorNames } = swarmContent;
+    const { title, body, subtitle, authorNames, initialPublishTime, lastModifyTime } = swarmContent;
     const rewardValueEther = this.props.rewardValueEther || web3.utils.fromWei(rewardValue.toString(), 'ether');
+
+    const timestamp = initialPublishTime || lastModifyTime;
+
+    const authors = authorNames && authorNames.length > 0 && <span style={{ marginRight: 10 }}>Authored by: {authorNames.join(', ')}</span>;
+    const time = timestamp && <span>on {moment(timestamp).format('YYYY-MM-DD')}</span>;
+    const lineOne = subtitle ? <p>{subtitle}</p> : <p style={{ fontFamily: 'monospace' }}>{address}</p>;
+    const lineTwo = (authors || time) ? <p>{authors}{time}</p> : <p>No record of authors and time</p>;
 
     return (
       <Card {...otherProps}>
@@ -30,8 +38,8 @@ export default class ArticleAbstractCard extends Component {
             {title}
           </Card.Header>
           <Card.Meta>
-            {subtitle && <p>{subtitle}</p>}
-            {authorNames && authorNames.length > 0 && <p>Authored by: {authorNames.join(', ')}</p>}
+            {lineOne}
+            {lineTwo}
           </Card.Meta>
           <div>
             <div hidden={simple} style={{ margin: '10px 0' }}>
@@ -52,7 +60,7 @@ export default class ArticleAbstractCard extends Component {
                 <span>{ncTokenReward.toString()} NCT tokens</span>
               </Label>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginTop: 5}}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginTop: 5 }}>
               <p style={{ height: 96, lineHeight: '24px', overflow: 'hidden' }}>{h2p(body)}</p>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>

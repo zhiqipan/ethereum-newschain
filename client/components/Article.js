@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Grid, Menu, Icon, Label } from 'semantic-ui-react';
+import moment from 'moment';
 import HtmlViewer from './HtmlViewer';
 import { Link } from '../../routes';
 
@@ -15,7 +16,7 @@ export default class Article extends Component {
 
   render() {
     const { address, contentHash, swarmContent, autoTokenRewarded, inverted } = this.props;
-    const { title, body, subtitle, authorNames, editorNames, geoLocation } = swarmContent;
+    const { title, body, subtitle, authorNames, editorNames, geoLocation, initialPublishTime, lastModifyTime } = swarmContent;
     const version = parseInt(this.props.version);
     const { Row, Column } = Grid;
     return (
@@ -64,12 +65,16 @@ export default class Article extends Component {
               {authorNames && authorNames.length > 0 && <Label color={inverted ? 'grey' : null}>Authored by: {authorNames.join(', ')}</Label>}
               {editorNames && editorNames.length > 0 && <Label color={inverted ? 'grey' : null}>Edited by: {editorNames.join(', ')}</Label>}
               {geoLocation && <Label color={inverted ? 'grey' : null}>From: {geoLocation}</Label>}
+              {initialPublishTime && <Label>Initial published: {moment(initialPublishTime).format('YYYY-MM-DD HH:mm')}</Label>}
+              {lastModifyTime && <Label>Last modified: {moment(lastModifyTime).format('YYYY-MM-DD HH:mm')}</Label>}
             </div>
           </Column>
         </Row>
         <Row>
           <Column>
-            <HtmlViewer html={body} />
+            <div style={{ marginLeft: 3 }}>
+              <HtmlViewer html={body} />
+            </div>
           </Column>
         </Row>
       </Grid>

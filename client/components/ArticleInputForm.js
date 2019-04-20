@@ -27,13 +27,20 @@ export default class ArticleInputForm extends Component {
     errorMessage: null,
   };
 
-  componentDidMount() {
-    this.setState({ ...this.props.initialSwarmContent });
+  init = async () => {
+    const { initialSwarmContent: content } = this.props;
+    if (content.authorNames) content.authorNames = content.authorNames.join(', ');
+    if (content.editorNames) content.editorNames = content.editorNames.join(', ');
+    this.setState({ ...content });
+  };
+
+  async componentDidMount() {
+    await this.init();
   }
 
-  componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps) {
     if (prevProps.initialSwarmContent !== this.props.initialSwarmContent) {
-      this.setState({ ...this.props.initialSwarmContent });
+      await this.init();
     }
   }
 
@@ -56,8 +63,13 @@ export default class ArticleInputForm extends Component {
     this.setState({ transacting: true, errorMessage: '' });
     this.props.onTransacting(true);
     try {
+      const timestamp = new Date().getTime();
+      const swarmContent = { title, body, subtitle, authorNames, editorNames, geoLocation };
+      if (this.props.mode === 'create') swarmContent.initialPublishTime = timestamp;
+      if (this.props.mode === 'modify') swarmContent.lastModifyTime = timestamp;
+
       console.info('Publishing article to Swarm...');
-      const hash = await putToSwarm(JSON.stringify({ title, body, subtitle, authorNames, editorNames, geoLocation }));
+      const hash = await putToSwarm(JSON.stringify(swarmContent));
       const account = (await web3.eth.getAccounts())[0];
       console.info('Article published to Swarm:', hash);
 
