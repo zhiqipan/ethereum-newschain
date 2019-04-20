@@ -4,11 +4,19 @@ import Layout from '../../client/components/Layout';
 import CitationVisualGlobal from '../../client/components/visual/CitationVisualGlobal';
 import ArticleList from '../../client/components/ArticleList';
 import factory from '../../ethereum/instances/factory';
+import { Context } from '../../client/context/context';
+import { MenuItemEnum } from '../../client/context/menu';
 
 export default class VisualIndexPage extends Component {
+  static contextType = Context;
+
   static async getInitialProps() {
     const articles = await factory.methods.getArticles().call();
     return { articles };
+  }
+
+  componentDidMount() {
+    this.context.menu.select(MenuItemEnum.VISUAL);
   }
 
   state = {

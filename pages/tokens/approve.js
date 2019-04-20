@@ -8,8 +8,12 @@ import { getFromSwarm } from '../../client/utils/swarm';
 import ArticleAbstractCard from '../../client/components/ArticleAbstractCard';
 import TokenLabel from '../../client/components/TokenLabel';
 import AddressLabel from '../../client/components/AddressLabel';
+import { Context } from '../../client/context/context';
+import { MenuItemEnum } from '../../client/context/menu';
 
 export default class TokenApprovePage extends Component {
+  static contextType = Context;
+
   static async getInitialProps(props) {
     const { token: tokenAddr, article: articleAddr } = props.query;
     const result = {};
@@ -34,6 +38,8 @@ export default class TokenApprovePage extends Component {
   };
 
   async componentDidMount() {
+    this.context.menu.select(MenuItemEnum.TOKENS);
+
     const { address } = this.props.token;
     const { rewardRecipient: recipient } = this.props.article;
     const account = (await web3.eth.getAccounts())[0];

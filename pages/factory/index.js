@@ -6,8 +6,12 @@ import AddressLabel from '../../client/components/AddressLabel';
 import web3 from '../../ethereum/utils/web3';
 import factory, { factoryAddress } from '../../ethereum/instances/factory';
 import loadFactorySummary from '../../client/utils/loadFactorySummary';
+import { Context } from '../../client/context/context';
+import { MenuItemEnum } from '../../client/context/menu';
 
 export default class FactoryIndexPage extends Component {
+  static contextType = Context;
+
   static async getInitialProps() {
     const summary = await loadFactorySummary();
     return { ...summary };
@@ -16,6 +20,10 @@ export default class FactoryIndexPage extends Component {
   state = {
     menuActive: 'switch',
   };
+
+  componentDidMount() {
+    this.context.menu.select(MenuItemEnum.FACTORY);
+  }
 
   renderBigStat(label, value, color) {
     return (

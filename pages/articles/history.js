@@ -5,8 +5,12 @@ import getArticle from '../../ethereum/instances/article';
 import { getFromSwarm } from '../../client/utils/swarm';
 import { Loader, Pagination, Segment } from 'semantic-ui-react';
 import Article from '../../client/components/Article';
+import { Context } from '../../client/context/context';
+import { MenuItemEnum } from '../../client/context/menu';
 
 export default class ArticleHistoryPage extends Component {
+  static contextType = Context;
+
   static async getInitialProps(props) {
     const { address } = props.query;
     const lastVersionNum = parseInt(await getArticle(address).methods.version().call());
@@ -24,6 +28,8 @@ export default class ArticleHistoryPage extends Component {
   };
 
   async componentDidMount() {
+    this.context.menu.select(MenuItemEnum.ARTICLES);
+
     const { latestHash: contentHash } = this.props;
     const { title, body } = JSON.parse(await getFromSwarm(contentHash));
     this.setState(state => {

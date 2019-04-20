@@ -3,13 +3,16 @@ import Layout from '../../client/components/Layout';
 import web3 from '../../ethereum/utils/web3';
 import { tokenAddress as nctAddress } from '../../ethereum/instances/token';
 import getERC20 from '../../ethereum/instances/erc20';
-import { Button, Card, Form, Grid, Menu, Message, Statistic } from 'semantic-ui-react';
+import { Card, Grid, Menu, Statistic } from 'semantic-ui-react';
 import TokenLabel from '../../client/components/TokenLabel';
 import AddressLabel from '../../client/components/AddressLabel';
-import { isValidAddress, isValidAmount } from '../../client/utils/validate';
+import { isValidAddress } from '../../client/utils/validate';
 import TxForm from '../../client/components/TxForm';
+import { Context } from '../../client/context/context';
+import { MenuItemEnum } from '../../client/context/menu';
 
 export default class TokensIndexPage extends Component {
+  static contextType = Context;
 
   state = {
     account: '',
@@ -34,6 +37,8 @@ export default class TokensIndexPage extends Component {
   };
 
   async componentDidMount() {
+    this.context.menu.select(MenuItemEnum.TOKENS);
+
     const account = (await web3.eth.getAccounts())[0];
     const balance = await getERC20(nctAddress).methods.balanceOf(account).call();
     this.setState({ account, balance, tokenAddress: nctAddress, name: 'NewsChain Token', symbol: 'NCT' });

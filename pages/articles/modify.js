@@ -6,12 +6,16 @@ import { Router, Link } from '../../routes';
 import { getFromSwarm, putToSwarm } from '../../client/utils/swarm';
 import getArticle from '../../ethereum/instances/article';
 import dynamic from 'next/dynamic';
+import { Context } from '../../client/context/context';
+import { MenuItemEnum } from '../../client/context/menu';
 
 const MarkdownEditor = process.browser ? dynamic(() => {
   return import('../../client/components/MarkdownEditor' /* webpackChunkName: 'MarkdownEditor' */);
 }) : () => null;
 
 export default class ArticleModifyPage extends Component {
+  static contextType = Context;
+
   static getInitialProps(props) {
     const { address, hash: contentHash } = props.query;
     return { address, contentHash };
@@ -32,6 +36,8 @@ export default class ArticleModifyPage extends Component {
   };
 
   async componentDidMount() {
+    this.context.menu.select(MenuItemEnum.ARTICLES);
+
     const { title, body } = JSON.parse(await getFromSwarm(this.props.contentHash));
     this.setState({ title, body });
 

@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
-import Layout from '../client/components/Layout';
 import { Button, Card, Grid, Statistic } from 'semantic-ui-react';
+import Layout from '../client/components/Layout';
+import { Context } from '../client/context/context';
 import { Link } from '../routes';
 import factory from '../ethereum/instances/factory';
 import token from '../ethereum/instances/token';
+import { MenuItemEnum } from '../client/context/menu';
 
 export default class IndexPage extends Component {
+  static contextType = Context;
 
   async componentDidMount() {
+    this.context.menu.select(MenuItemEnum.HOME);
     const articles = await factory.methods.getArticles().call();
     const tokenSupply = await token.methods.totalSupply().call();
     this.setState({ articleCount: articles.length, tokenSupply });
