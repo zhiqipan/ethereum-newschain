@@ -71,13 +71,14 @@ export default class ArticleList extends Component {
         if (words && words.length > 0) wordsAndPhrases.push(...words.map(w => w.trim()).filter(Boolean));
 
         const { title, body, subtitle = '', authorNames, initialPublishTime, lastModifyTime } = article.swarmContent;
+        const plainBody = h2p(body);
         let matched = false;
         wordsAndPhrases.forEach(wordOrPhrase => {
           const wp = wordOrPhrase.toLowerCase();
           if (addr.toLowerCase().includes(wp)) matched = true;
           if (title.toLowerCase().includes(wp)) matched = true;
           if (subtitle.toLowerCase().includes(wp)) matched = true;
-          if (body.toLowerCase().includes(wp)) matched = true;
+          if (plainBody && plainBody.toLowerCase().includes(wp)) matched = true;
           if (authorNames && authorNames.length > 0 && authorNames.join(' ').toLowerCase().includes(wp)) matched = true;
           if (initialPublishTime && moment(initialPublishTime).format('YYYY-MM-DD').toLowerCase().includes(wp)) matched = true;
           if (lastModifyTime && moment(lastModifyTime).format('YYYY-MM-DD').toLowerCase().includes(wp)) matched = true;
