@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Loader, Pagination } from 'semantic-ui-react';
+import { Card, Divider, Input, Loader, Pagination } from 'semantic-ui-react';
 import h2p from 'html2plaintext';
 import moment from 'moment';
 import { Link } from '../../routes';
@@ -17,6 +17,7 @@ export default class ArticleList extends Component {
     articlesDetail: {},
     itemsPerPage: 10,
     activePage: 1, // start from 1
+    filterInput: '',
   };
 
   load = (articles) => {
@@ -42,11 +43,47 @@ export default class ArticleList extends Component {
     }
   }
 
+  renderSearchBar() {
+    const { filterInput } = this.state;
+
+    return (
+      <div style={{ marginBottom: 20 }}>
+        <Input value={filterInput} onChange={e => this.setState({ filterInput: e.target.value })} placeholder='filter anything' />
+        <Divider />
+      </div>
+    );
+  }
+
   render() {
     const { articles: addresses } = this.props;
-    const { articlesDetail, activePage, itemsPerPage } = this.state;
+    const { articlesDetail, activePage, itemsPerPage, filterInput } = this.state;
 
     const items = addresses
+      .filter(addr => { // do this filtering before paging
+        const article = articlesDetail[addr] || cachedArticles[addr];
+        if (!article || !filterInput) return true;
+
+        const wordsAndPhrases = [];
+
+        const phrases = filterInput.trim().match(/(\s*"([^"]|"")*"\s*)/g);
+        if (phrases && phrases.length > 0) wordsAndPhrases.push(...phrases.map(p => p.substr(1, p.length - 2).trim()).filter(Boolean));
+        const words = filterInput.trim().replace(/("([^"]|"")*")/g, ' ').split(/\s+/);
+        if (words && words.length > 0) wordsAndPhrases.push(...words.map(w => w.trim()).filter(Boolean));
+
+        const { title, body, subtitle = '', authorNames, initialPublishTime, lastModifyTime } = article.swarmContent;
+        let matched = false;
+        wordsAndPhrases.forEach(wordOrPhrase => {
+          const wp = wordOrPhrase.toLowerCase();
+          if (addr.toLowerCase().includes(wp)) matched = true;
+          if (title.toLowerCase().includes(wp)) matched = true;
+          if (subtitle.toLowerCase().includes(wp)) matched = true;
+          if (body.toLowerCase().includes(wp)) matched = true;
+          if (authorNames && authorNames.length > 0 && authorNames.join(' ').toLowerCase().includes(wp)) matched = true;
+          if (initialPublishTime && moment(initialPublishTime).format('YYYY-MM-DD').toLowerCase().includes(wp)) matched = true;
+          if (lastModifyTime && moment(lastModifyTime).format('YYYY-MM-DD').toLowerCase().includes(wp)) matched = true;
+        });
+        return matched;
+      })
       .filter((_, index) => {
         return index >= (activePage - 1) * itemsPerPage && index < activePage * itemsPerPage;
       })
@@ -85,6 +122,7 @@ export default class ArticleList extends Component {
 
     return (
       <div>
+        {this.renderSearchBar()}
         <Card.Group items={items} />
         <Pagination
           style={{ marginTop: 20 }}
