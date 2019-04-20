@@ -45,8 +45,9 @@ export default class ArticleList extends Component {
 
       if (!article) {
         return {
-          header: addr,
-          meta: <Link route={this.props.getLink(addr)}>View article</Link>,
+          key: addr,
+          header: <span style={{ fontFamily: 'monospace', whiteSpace: 'nowrap' }}>{addr}</span>,
+          meta: 'Loading...',
           description: <Loader active />,
           fluid: true,
         };
@@ -54,7 +55,7 @@ export default class ArticleList extends Component {
 
       return {
         header: article.title,
-        meta: <Link route={this.props.getLink(addr)}>View article</Link>,
+        meta: <Link route={this.props.getLink(addr)}><a>View article</a></Link>,
         description: <p style={styles.bodyAbstract}>{h2p(article.body)}</p>,
         fluid: true,
       };
