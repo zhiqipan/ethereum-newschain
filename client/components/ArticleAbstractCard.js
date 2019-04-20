@@ -20,7 +20,7 @@ export default class ArticleAbstractCard extends Component {
   };
 
   render() {
-    const { title, body, address, citations, citedBy, contentHash, rewardValue, ncTokenReward, simple, ...otherProps } = this.props;
+    const { title, body, address, citations, citedBy, contentHash, rewardValue, ncTokenReward, simple, renderCornerButton, ...otherProps } = this.props;
     const rewardValueEther = this.props.rewardValueEther || web3.utils.fromWei(rewardValue.toString(), 'ether');
 
     return (
@@ -59,7 +59,7 @@ export default class ArticleAbstractCard extends Component {
                   <p><a target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>Permalink</a></p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                  {this.props.renderCornerButton()}
+                  {renderCornerButton()}
                 </div>
               </div>
             </div>

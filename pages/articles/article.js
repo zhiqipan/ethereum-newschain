@@ -111,7 +111,7 @@ export default class ArticleDetailPage extends Component {
         {picked &&
         <Button negative content='Unpick' onClick={() => this.context.picks.unpick(address)} />
         }
-        <Link route={`/articles/${address}/modify?hash=${contentHash}`}><a><Button content='Modify' /></a></Link>
+        <Link route={`/articles/${address}/modify?hash=${contentHash}`}><a className='ui button'>Modify</a></Link>
       </Layout>
     );
   }

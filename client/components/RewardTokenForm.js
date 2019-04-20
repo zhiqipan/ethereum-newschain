@@ -166,7 +166,7 @@ export default class RewardTokenForm extends Component {
             </p>
             {(tokenAmount - approvedAmount) > 0 &&
             <Link route={`/tokens/${tokenAddress}/approve/${this.props.address}`}>
-              <Button secondary content='Go approve' />
+              <a className='ui button secondary'>Go approve</a>
             </Link>
             }
           </div>

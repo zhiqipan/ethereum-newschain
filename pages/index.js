@@ -42,7 +42,7 @@ export default class IndexPage extends Component {
         </Card>
         <div style={{ marginTop: 20, textAlign: 'center' }}>
           <Link route='/articles'>
-            <Button color='orange' size='large'>More to discover...</Button>
+            <a className='ui button color orange huge'>More to Discover...</a>
           </Link>
         </div>
       </Layout>

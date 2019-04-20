@@ -101,8 +101,8 @@ export default class CitationVisualGlobal extends Component {
               const activeButton = activeFrom === address || activeTo === address;
               const greyButton = article.isolated;
               return (
-                <div style={{ marginBottom: 15, whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                  <Button color={activeButton && 'orange'} basic={!activeButton} compact size='small'
+                <div key={address} style={{ marginBottom: 15, whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                  <Button color={activeButton ? 'orange' : null} basic={!activeButton} compact size='small'
                           inverted={greyButton} onClick={() => {
                     this.setState(state => {
                       const map = state.articleMap;
