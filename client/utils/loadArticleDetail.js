@@ -27,6 +27,9 @@ export async function loadArticleSummary(address) {
   return translateSummary(await getArticle(address).methods.getSummary().call());
 }
 
+// 2019-04-20: I once notice that web3 in MetaMask fails the call of tokenRewardValue method,
+// reinstalling MetaMask solves the issue,
+// this is detected because Incognito mode of Chrome works well while it doesn't work in normal mode
 export default async function loadArticleDetail(address, populate = false) {
   const summary = translateSummary(await getArticle(address).methods.getSummary().call());
   const ncTokenReward = await getArticle(address).methods.tokenRewardValue(tokenAddress).call();
