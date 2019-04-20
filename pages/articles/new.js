@@ -6,15 +6,16 @@ import web3 from '../../ethereum/utils/web3';
 import factory from '../../ethereum/instances/factory';
 import { Router, Link } from '../../routes';
 import { putToSwarm } from '../../client/utils/swarm';
-import { PicksContext } from '../../client/context/picks';
+import { Context } from '../../client/context/context';
 import ArticleAbstractCard from '../../client/components/ArticleAbstractCard';
+import { MenuItemEnum } from '../../client/context/menu';
 
 const MarkdownEditor = process.browser ? dynamic(() => {
   return import('../../client/components/MarkdownEditor' /* webpackChunkName: 'MarkdownEditor' */);
 }) : () => null;
 
 export default class ArticleNewPage extends Component {
-  static contextType = PicksContext;
+  static contextType = Context;
 
   state = {
     title: '',
@@ -22,6 +23,10 @@ export default class ArticleNewPage extends Component {
     transacting: false,
     errorMessage: null,
   };
+
+  componentDidMount() {
+    this.context.menu.select(MenuItemEnum.ARTICLES);
+  }
 
   onSubmit = async event => {
     event.preventDefault();
@@ -33,11 +38,11 @@ export default class ArticleNewPage extends Component {
       const hash = await putToSwarm(JSON.stringify({ title, body }));
       const account = (await web3.eth.getAccounts())[0];
       console.info('Article published to Swarm:', hash);
-      const result = await factory.methods.createArticle('0x' + hash, account, Object.keys(this.context.articles)).send({
+      const result = await factory.methods.createArticle('0x' + hash, account, Object.keys(this.context.picks.articles)).send({
         from: account,
       });
       console.info('Article confirmed on Ethereum:', `block #${result.blockNumber}, transaction ${result.transactionHash}`);
-      this.context.unpickAll();
+      this.context.picks.unpickAll();
       await Router.replaceRoute('/articles');
     } catch (e) {
       console.error(e);
@@ -47,7 +52,7 @@ export default class ArticleNewPage extends Component {
   };
 
   renderPickedArticles() {
-    const { articles } = this.context;
+    const { articles } = this.context.picks;
 
     if (Object.keys(articles).length === 0) return <p>No citation</p>;
 
@@ -64,7 +69,7 @@ export default class ArticleNewPage extends Component {
               renderCornerButton={() => {
                 return (
                   <a style={this.state.transacting ? { color: 'lightgray', cursor: 'default' } : {}}
-                     onClick={() => !this.state.transacting && this.context.unpick(addr)}>Unpick</a>
+                     onClick={() => !this.state.transacting && this.context.picks.unpick(addr)}>Unpick</a>
                 );
               }}
             />

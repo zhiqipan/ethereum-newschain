@@ -4,8 +4,12 @@ import factory from '../../ethereum/instances/factory';
 import Layout from '../../client/components/Layout';
 import { Link } from '../../routes';
 import ArticleList from '../../client/components/ArticleList';
+import { Context } from '../../client/context/context';
+import { MenuItemEnum } from '../../client/context/menu';
 
 export default class ArticlesIndexPage extends Component {
+  static contextType = Context;
+
   static async getInitialProps() {
     const articles = await factory.methods.getArticles().call();
     return { articles };
@@ -15,6 +19,10 @@ export default class ArticlesIndexPage extends Component {
     refreshing: false,
     articles: this.props.articles,
   };
+
+  componentDidMount() {
+    this.context.menu.select(MenuItemEnum.ARTICLES);
+  }
 
   refresh = async () => {
     this.setState({ articles: [], refreshing: true });

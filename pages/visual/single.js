@@ -3,11 +3,19 @@ import { Card, Menu } from 'semantic-ui-react';
 import Layout from '../../client/components/Layout';
 import CitationVisualSingle from '../../client/components/visual/CitationVisualSingle';
 import ArticleStreamline from '../../client/components/ArticleStreamline';
+import { Context } from '../../client/context/context';
+import { MenuItemEnum } from '../../client/context/menu';
 
 export default class VisualSinglePage extends Component {
+  static contextType = Context;
+
   static getInitialProps(props) {
     const { address, tab } = props.query;
     return { address, tab };
+  }
+
+  componentDidMount() {
+    this.context.menu.select(MenuItemEnum.VISUAL);
   }
 
   state = {

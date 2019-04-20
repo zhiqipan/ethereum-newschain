@@ -1,22 +1,27 @@
 import React, { Component } from 'react';
-import { Button, Card, Divider, Grid, Icon, Label, Segment } from 'semantic-ui-react';
+import { Button, Card, Divider, Grid, Segment } from 'semantic-ui-react';
 import { Link } from '../../routes';
 import Layout from '../../client/components/Layout';
 import RewardForm from '../../client/components/RewardForm';
 import web3 from '../../ethereum/utils/web3';
-import { PicksContext } from '../../client/context/picks';
+import { Context } from '../../client/context/context';
 import loadArticleDetail from '../../client/utils/loadArticleDetail';
 import Article from '../../client/components/Article';
 import AddressLabel from '../../client/components/AddressLabel';
+import { MenuItemEnum } from '../../client/context/menu';
 
 export default class ArticleDetailPage extends Component {
-  static contextType = PicksContext;
+  static contextType = Context;
 
   static async getInitialProps(props) {
     const { address } = props.query;
     const detail = await loadArticleDetail(address);
 
     return { address, ...detail };
+  }
+
+  componentDidMount() {
+    this.context.menu.select(MenuItemEnum.ARTICLES);
   }
 
   renderSummary() {
@@ -51,7 +56,7 @@ export default class ArticleDetailPage extends Component {
 
   render() {
     const { address, contentHash, title, body, citations, citedBy, rewardValue, version, creator, rewardRecipient, autoTokenRewarded, ncTokenReward } = this.props;
-    const picked = this.context.articles[address];
+    const picked = this.context.picks.articles[address];
     const payload = {
       contentHash,
       title,
@@ -101,12 +106,12 @@ export default class ArticleDetailPage extends Component {
         </Grid>
         <Divider />
         {!picked &&
-        <Button primary content='Pick to cite' onClick={() => this.context.pick(address, payload)} />
+        <Button primary content='Pick to cite' onClick={() => this.context.picks.pick(address, payload)} />
         }
         {picked &&
-        <Button negative content='Unpick' onClick={() => this.context.unpick(address)} />
+        <Button negative content='Unpick' onClick={() => this.context.picks.unpick(address)} />
         }
-        <Link route={`/articles/${address}/modify?hash=${contentHash}`}><Button content='Modify' /></Link>
+        <Link route={`/articles/${address}/modify?hash=${contentHash}`}><a><Button content='Modify' /></a></Link>
       </Layout>
     );
   }
