@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Grid, Statistic } from 'semantic-ui-react';
+import { Card, Grid, Icon, Label, Statistic } from 'semantic-ui-react';
 import Layout from '../client/components/Layout';
 import { Context } from '../client/context/context';
 import { Link } from '../routes';
@@ -21,20 +21,26 @@ export default class IndexPage extends Component {
 
   async checkMetamask() {
     if (process.browser) {
+      let metamaskOk = true;
       if (!window.web3) {
         this.setState({ metamaskWarning: 'MetaMask not installed in your browser' });
+        metamaskOk = false;
       } else {
         const enabled = (await web3.eth.getAccounts()).length > 0;
         if (!enabled) {
-          this.setState({ metamaskWarning: 'MetaMask not enabled on this site, run ethereum.enable() in browser console first' });
+          this.setState({ metamaskWarning: 'MetaMask not enabled on this site, run ethereum.enable() in browser console first', hasMetamask: false });
+          metamaskOk = false;
         }
       }
+      this.setState({ metamaskOk });
     }
   }
 
   state = {
     articleCount: 0,
     tokenSupply: 0,
+    metamaskOk: null,
+    metamaskWarning: null,
   };
 
   render() {
@@ -50,7 +56,7 @@ export default class IndexPage extends Component {
                 <Statistic color='orange' label='Articles published' value={this.state.articleCount} size='huge' />
               </Grid.Column>
               <Grid.Column style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Statistic color='orange' label='NC Tokens generated' value={this.state.tokenSupply} size='huge' />
+                <Statistic color='orange' label='Tokens offered' value={this.state.tokenSupply} size='huge' />
               </Grid.Column>
             </Grid>
           </Card.Content>
@@ -60,11 +66,14 @@ export default class IndexPage extends Component {
             <a className='ui button color orange huge'>More to Discover...</a>
           </Link>
         </div>
-        {this.state.metamaskWarning &&
+        {this.state.metamaskOk === false &&
         <div style={{ margin: 20, textAlign: 'center', color: 'grey' }}>
           <p>{this.state.metamaskWarning}</p>
           <p><b>You can only read information on this site</b></p>
         </div>
+        }
+        {this.state.metamaskOk === true &&
+        <div style={{ margin: 20, textAlign: 'center' }}><Label color='orange' basic><Icon name='check' />MetaMask ready</Label></div>
         }
       </Layout>
     );

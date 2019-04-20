@@ -112,10 +112,13 @@ export default class CitationVisualSingle extends Component {
   }
 
   renderEmptySankey() {
+    let text = 'This is a standalone (isolated) article';
+    if (this.props.mode === 'citations') text = 'This article cites nothing';
+    if (this.props.mode === 'citedBy') text = 'This article is not cited by others';
     return (
       <Segment style={{ height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
         <Icon name='ban' size='huge' />
-        <h3>This is a standalone (isolated) article</h3>
+        <h3>{text}</h3>
       </Segment>
     );
   }

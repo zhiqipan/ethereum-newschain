@@ -41,7 +41,8 @@ export default class FactoryIndexPage extends Component {
     return (
       <Layout>
         <h1>Factory</h1>
-        <p>All the articles are constructed here! The manager has full control of how things work</p>
+        <p>All the articles are constructed here! The manager has full control of how things work.</p>
+        <p>Citation reward is a derived version of Initial Coin Offering (ICO) for our NewsChain Token (NCT).</p>
         <Card fluid>
           <Card.Content>
             <AddressLabel color='violet' icon='cogs' name='Factory address' address={factoryAddress} style={{ marginBottom: 10 }} />
@@ -100,7 +101,7 @@ class FactoryChangeForm extends Component {
     return (
       <Grid>
         <Grid.Column width={6} textAlign='left'>
-          <Form onSubmit={async () => {
+          <Form error={!!error} warning={!!warning} onSubmit={async () => {
             this.setState({ transacting: true });
             try {
               const account = (await web3.eth.getAccounts())[0];
