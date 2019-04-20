@@ -10,9 +10,13 @@ let web3;
 if (process.browser && typeof window.web3 === 'object') {
   // running/rendering on browser with MetaMask
   web3 = new Web3(window.web3.currentProvider);
-  if (window.ethereum && !window.ethereum.selectedAddress) {
-    console.warn('MetaMask is not enable on this site, please call ethereum.enable() in your browser console for this domain first');
-  }
+  web3.eth.getAccounts().then(accounts => {
+    if (accounts.length === 0) {
+      console.warn('MetaMask is not enable on this site, please call ethereum.enable() in your browser console for this domain first');
+    } else {
+      console.log('OK: MetaMask installed and enabled for this site');
+    }
+  });
 } else {
   // running/rendering on server *OR* the user does not have MetaMask
   const provider = new Web3.providers.HttpProvider(ETHEREUM_NODE_ADDRESS);
