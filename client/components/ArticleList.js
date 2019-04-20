@@ -16,11 +16,9 @@ export default class ArticleList extends Component {
     articles: {},
   };
 
-  render() {
-    const items = this.props.articles.map(addr => {
-      const article = this.state.articles[addr] || cachedArticles[addr];
-
-      if (!article) {
+  load = (articles) => {
+    articles.map(addr => {
+      if (!cachedArticles[addr])
         loadArticleDetail(addr).then(detail => {
           this.setState(state => {
             state.articles[addr] = detail;
@@ -28,7 +26,24 @@ export default class ArticleList extends Component {
             return { articles: { ...state.articles } };
           });
         });
+    });
+  };
 
+  componentDidMount() {
+    this.load(this.props.articles);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.articles !== this.props.articles) {
+      this.load(this.props.articles);
+    }
+  }
+
+  render() {
+    const items = this.props.articles.map(addr => {
+      const article = this.state.articles[addr] || cachedArticles[addr];
+
+      if (!article) {
         return {
           header: addr,
           meta: <Link route={this.props.getLink(addr)}>View article</Link>,
