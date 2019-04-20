@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { makeWidthFlexible, Sankey } from 'react-vis';
-import { loadDataGlobal, recomputeGlobal } from '../../visual/dataProcessor';
 import { Button, Card, Radio, Segment } from 'semantic-ui-react';
+import h2p from 'html2plaintext';
+import { loadDataGlobal, recomputeGlobal } from '../../visual/dataProcessor';
 import loadArticleDetail from '../../utils/loadArticleDetail';
 import { loadArticleDetail as __loadFakeDetail } from '../../visual/fixtures';
 import ArticleAbstractCard from '../ArticleAbstractCard';
@@ -140,7 +141,7 @@ export default class CitationVisualGlobal extends Component {
                       height: 13,
                       textOverflow: 'ellipsis',
                       overflow: 'hidden',
-                    }}>{article.body}</p>
+                    }}>{h2p(article.body)}</p>
                   </div>
                 </div>
               );

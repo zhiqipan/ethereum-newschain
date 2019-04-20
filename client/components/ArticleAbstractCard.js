@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Card, Icon, Label } from 'semantic-ui-react';
+import h2p from 'html2plaintext';
 import web3 from '../../ethereum/utils/web3';
 import { Link } from '../../routes';
-import HtmlViewer from './HtmlViewer';
 
 export default class ArticleAbstractCard extends Component {
   static defaultProps = {
@@ -52,7 +52,7 @@ export default class ArticleAbstractCard extends Component {
               </Label>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <HtmlViewer style={{ height: 96, lineHeight: '24px', overflow: 'hidden' }} html={body.replace(/<img[^>]*>/g, '')} />
+              <p style={{ height: 96, lineHeight: '24px', overflow: 'hidden' }}>{h2p(body)}</p>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
                   <Link route={`/articles/${address}`}><a>View article</a></Link>

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Card, Loader } from 'semantic-ui-react';
+import h2p from 'html2plaintext';
 import { Link } from '../../routes';
 import loadArticleDetail from '../../client/utils/loadArticleDetail';
-import HtmlViewer from '../../client/components/HtmlViewer';
 
 const cachedArticles = {};
 
@@ -55,7 +55,7 @@ export default class ArticleList extends Component {
       return {
         header: article.title,
         meta: <Link route={this.props.getLink(addr)}>View article</Link>,
-        description: <HtmlViewer html={article.body.replace(/<img[^>]*>/g, '')} style={styles.bodyAbstract} />,
+        description: <p style={styles.bodyAbstract}>{h2p(article.body)}</p>,
         fluid: true,
       };
     });

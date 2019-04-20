@@ -17,6 +17,7 @@
     "braft-editor": "^2.2.9",
     "fs-extra": "^7.0.1",
     "ganache-cli": "^6.1.8",
+    "html2plaintext": "^2.1.2",
     "next": "^8.1.0",
     "next-routes": "^1.4.2",
     "react": "^16.8.6",
