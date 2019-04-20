@@ -80,7 +80,7 @@ export default class CitationVisualGlobal extends Component {
             </div>
             <div>
               <AddressLabel color='orange' icon='ethereum' name='Derived' basic address={hoverTo} />&nbsp;&nbsp;
-              <b>{articleMap[hoverFrom].title}</b>
+              <b>{articleMap[hoverTo].title}</b>
             </div>
           </>
           }
