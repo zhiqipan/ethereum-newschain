@@ -48,7 +48,11 @@ export default class ArticleList extends Component {
 
     return (
       <div style={{ marginBottom: 20 }}>
-        <Input value={filterInput} onChange={e => this.setState({ filterInput: e.target.value })} placeholder='filter anything' />
+        <Input
+          style={{ width: 500 }}
+          value={filterInput}
+          onChange={e => this.setState({ filterInput: e.target.value })}
+          placeholder='filter anything' />
         <Divider />
       </div>
     );
