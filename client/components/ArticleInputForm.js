@@ -31,7 +31,8 @@ export default class ArticleInputForm extends Component {
     const { initialSwarmContent: content } = this.props;
     if (content.authorNames) content.authorNames = content.authorNames.join(', ');
     if (content.editorNames) content.editorNames = content.editorNames.join(', ');
-    this.setState({ ...content });
+    const initialBody = content.body;
+    this.setState({ ...content, initialBody });
   };
 
   async componentDidMount() {
@@ -110,7 +111,7 @@ export default class ArticleInputForm extends Component {
 
   render() {
     const { mode, disabled } = this.props;
-    const { body, transacting, errorMessage } = this.state;
+    const { initialBody, transacting, errorMessage } = this.state;
     const fields = [
       { name: 'title', label: 'Title', width: 8, icon: 'header', placeholder: '', required: true },
       { name: 'subtitle', label: 'Subtitle', width: 8, icon: 'header', placeholder: '' },
@@ -127,7 +128,7 @@ export default class ArticleInputForm extends Component {
             placeholder='speak up, your voice matters'
             disabled={transacting}
             onChange={html => this.setState({ body: html })}
-            initialHtml={body} />
+            initialValue={initialBody} />
         </Form.Field>
         {mode === 'create' &&
         <Button icon disabled={disabled || transacting} color='orange' loading={transacting}><Icon name='paper plane' />&nbsp;Create</Button>

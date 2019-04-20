@@ -6,7 +6,8 @@ import HtmlViewer from './HtmlViewer';
 export default class MarkdownEditor extends Component {
   static defaultProps = {
     placeholder: '',
-    initialHtml: '',
+    initialValue: '',
+    disabled: false,
     onChange: () => null,
     onSave: () => null,
   };
@@ -16,35 +17,44 @@ export default class MarkdownEditor extends Component {
   };
 
   componentDidMount() {
-    this.setState({ editorState: BraftEditor.createEditorState(this.props.initialHtml) });
+    this.setState({ editorState: BraftEditor.createEditorState(this.props.initialValue) });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.initialValue !== this.props.initialValue) {
+      this.setState({ editorState: BraftEditor.createEditorState(this.props.initialValue) });
+    }
   }
 
   render() {
-    const { editorState } = this.state;
+    const { editorState, loading } = this.state;
 
     if (this.props.disabled) {
       return (
         <div style={{ ...styles.wrapper, padding: 10 }}>
-          <HtmlViewer html={this.props.initialHtml} style={{ height: 574, overflow: 'auto' }} />
+          <HtmlViewer html={editorState.toHTML()} style={{ height: 574, overflow: 'auto' }} />
         </div>
       );
     }
 
     return (
       <div style={styles.wrapper}>
-        <BraftEditor
-          placeholder={this.props.placeholder}
-          value={editorState}
-          onChange={editorState => {
-            this.setState({ editorState });
-            const htmlContent = editorState.toHTML();
-            this.props.onChange(htmlContent);
-          }}
-          onSave={() => { // triggered when ctrl+s
-            const htmlContent = editorState.toHTML();
-            this.props.onSave(htmlContent);
-          }}
-        />
+        {loading ?
+          <p>Loading...</p> :
+          <BraftEditor
+            placeholder={this.props.placeholder}
+            value={editorState}
+            onChange={editorState => {
+              this.setState({ editorState });
+              const htmlContent = editorState.toHTML();
+              this.props.onChange(htmlContent);
+            }}
+            onSave={() => { // triggered when ctrl+s
+              const htmlContent = editorState.toHTML();
+              this.props.onSave(htmlContent);
+            }}
+          />
+        }
       </div>
     );
   }

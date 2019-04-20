@@ -24,7 +24,7 @@ export default class ArticleModifyPage extends Component {
   };
 
   state = {
-    loading: true,
+    loadingSwarm: true,
     swarmContent: {},
     isCreator: null,
   };
@@ -61,11 +61,8 @@ export default class ArticleModifyPage extends Component {
         <h1>Modify an article</h1>
         <AddressLabel basic name='Article address' icon='ethereum' address={address} color='orange' style={{ marginBottom: 20 }} />
         {!loadingSwarm &&
-        <>
-          <ArticleInputForm address={address} mode='modify' disabled={isCreator === false} initialSwarmContent={swarmContent} />
-        </>
+        <ArticleInputForm address={address} mode='modify' disabled={isCreator === false} initialSwarmContent={swarmContent} />
         }
-        <Loader active={loadingSwarm} />
         {isCreator === false &&
         <Message error header='You are not the creator' content={'Only the creator itself can modify this article'} />
         }
