@@ -34,7 +34,7 @@ export default class Article extends Component {
           </Column>
           <Column textAlign='right'>
             <Menu inverted={inverted} compact borderless secondary icon='labeled'>
-              <Menu.Item target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>
+              <Menu.Item target='_blank' href={`http://swarm-gateways.net/bzz-raw:/${contentHash}`}>
                 <Icon size='large' color='grey' name='linkify' />
                 Permalink
               </Menu.Item>

@@ -1,26 +1,23 @@
-const options = {};
-const swarmgw = require('swarmgw')(options);
+import axios from 'axios';
 
-export function putToSwarm(content) {
-  return new Promise((resolve, reject) => {
-    swarmgw.put(content, function (error, hash) {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(hash);
-      }
-    });
-  });
+function isValidHash(hash) {
+  return /^[0-9a-f]{64}$/.test(hash);
 }
 
-export function getFromSwarm(hash) {
-  return new Promise((resolve, reject) => {
-    swarmgw.get(`bzz-raw://${hash}`, function (error, content) {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(content);
-      }
-    });
-  });
+function getFile(hash) {
+  return axios.get('http://swarm-gateways.net/bzz-raw:/' + hash).then(res => res.data);
+}
+
+function putFile(content) {
+  return axios.post('http://swarm-gateways.net/bzz-raw:/', content).then(res => res.data);
+}
+
+export async function putToSwarm(content) {
+  const hash = await putFile(content);
+  if (isValidHash(hash)) return hash;
+  return null;
+}
+
+export async function getFromSwarm(hash) {
+  return JSON.stringify(await getFile(hash));
 }

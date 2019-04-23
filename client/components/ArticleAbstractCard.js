@@ -65,7 +65,7 @@ export default class ArticleAbstractCard extends Component {
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
                   <Link route={`/articles/${address}`}><a>View article</a></Link>
-                  <p style={{ marginTop: 10 }}><a target='_blank' href={`https://swarm-gateways.net/bzz-raw:/${contentHash}`}>Permalink</a></p>
+                  <p style={{ marginTop: 10 }}><a target='_blank' href={`http://swarm-gateways.net/bzz-raw:/${contentHash}`}>Permalink</a></p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-end' }}>
                   {renderCornerButton()}
