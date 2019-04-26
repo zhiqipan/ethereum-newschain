@@ -11,7 +11,10 @@ export default class ArticlesIndexPage extends Component {
   static contextType = Context;
 
   static async getInitialProps() {
-    const articles = await factory.methods.getArticles().call();
+    let articles = await factory.methods.getArticles().call();
+    if (articles) {
+      articles = articles.reverse();
+    }
     return { articles };
   }
 
@@ -26,7 +29,10 @@ export default class ArticlesIndexPage extends Component {
 
   refresh = async () => {
     this.setState({ articles: [], refreshing: true });
-    const articles = await factory.methods.getArticles().call();
+    let articles = await factory.methods.getArticles().call();
+    if (articles) {
+      articles = articles.reverse();
+    }
     this.setState({ articles, refreshing: false });
   };
 

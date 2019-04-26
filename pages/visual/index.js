@@ -11,7 +11,10 @@ export default class VisualIndexPage extends Component {
   static contextType = Context;
 
   static async getInitialProps() {
-    const articles = await factory.methods.getArticles().call();
+    let articles = await factory.methods.getArticles().call();
+    if (articles) {
+      articles = articles.reverse();
+    }
     return { articles };
   }
 
