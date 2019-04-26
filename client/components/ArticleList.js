@@ -15,7 +15,7 @@ export default class ArticleList extends Component {
 
   state = {
     articlesDetail: {},
-    itemsPerPage: 10,
+    itemsPerPage: 6,
     activePage: 1, // start from 1
     filterInput: '',
   };
