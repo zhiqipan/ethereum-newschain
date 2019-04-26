@@ -17,6 +17,8 @@ const LINK_OPACITY = 0.3;
 const HOVER_LINK_OPACITY = 0.6;
 const ACTIVE_LINK_OPACITY = 0.9;
 
+const h2pCache = {};
+
 export default class CitationVisualGlobal extends Component {
   state = {
     hoverLink: null,
@@ -54,7 +56,7 @@ export default class CitationVisualGlobal extends Component {
       <div>
         <h2>Citation relationship</h2>
         <FlexibleSankey
-          height={300}
+          height={600}
           nodes={nodes.map(node => {
             const a = this.state.articleMap[node.address];
             if (a && a.swarmContent && a.swarmContent.title) {
@@ -109,6 +111,15 @@ export default class CitationVisualGlobal extends Component {
               const article = articleMap[address];
               const activeButton = activeFrom === address || activeTo === address;
               const greyButton = article.isolated;
+
+              let bodyPlaintext = '';
+              if (article.swarmContent) {
+                if (!h2pCache[address]) {
+                  h2pCache[address] = h2p(article.swarmContent.body);
+                }
+                bodyPlaintext = h2pCache[address];
+              }
+
               return (
                 <div key={address} style={{ marginBottom: 15, whiteSpace: 'nowrap', overflow: 'hidden' }}>
                   <Button color={activeButton ? 'orange' : null} basic={!activeButton} compact size='small'
@@ -149,7 +160,7 @@ export default class CitationVisualGlobal extends Component {
                       height: 13,
                       textOverflow: 'ellipsis',
                       overflow: 'hidden',
-                    }}>{h2p(article.swarmContent && article.swarmContent.body)}</p>
+                    }}>{bodyPlaintext}</p>
                   </div>
                 </div>
               );
