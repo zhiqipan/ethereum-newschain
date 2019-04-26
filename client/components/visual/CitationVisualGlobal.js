@@ -58,7 +58,8 @@ export default class CitationVisualGlobal extends Component {
           nodes={nodes.map(node => {
             const a = this.state.articleMap[node.address];
             if (a && a.swarmContent && a.swarmContent.title) {
-              return { ...node, name: a.swarmContent.title.substr(0, 10) };
+              const title = a.swarmContent.title;
+              return { ...node, name: title.length > 12 ? (title.substr(0, 12) + '...') : title };
             } else {
               return node;
             }
