@@ -76,16 +76,18 @@ export default class ArticleList extends Component {
 
         const { creator, contentHash, swarmContent } = article;
         const { title, body, subtitle = '', authorNames, initialPublishTime, lastModifyTime } = swarmContent;
-        const plainBody = h2p(body);
+        // const plainBody = h2p(body);
         let matched = false;
         wordsAndPhrases.forEach(wordOrPhrase => {
+          if (!wordOrPhrase) return matched = false;
+
           const wp = wordOrPhrase.toLowerCase();
           if (wp.length >= 4 && addr.toLowerCase().includes(wp)) return matched = true;
           if (wp.length >= 4 && creator.toLowerCase().includes(wp)) return matched = true;
           if (wp.length >= 4 && contentHash.toLowerCase().includes(wp)) return matched = true;
           if (title.toLowerCase().includes(wp)) return matched = true;
           if (subtitle.toLowerCase().includes(wp)) return matched = true;
-          if (plainBody && plainBody.toLowerCase().includes(wp)) return matched = true;
+          // if (plainBody && plainBody.toLowerCase().includes(wp)) return matched = true;
           if (authorNames && authorNames.length > 0 && authorNames.join(' ').toLowerCase().includes(wp)) return matched = true;
           if (initialPublishTime && moment(initialPublishTime).format('YYYY-MM-DD').toLowerCase().includes(wp)) return matched = true;
           if (lastModifyTime && moment(lastModifyTime).format('YYYY-MM-DD').toLowerCase().includes(wp)) return matched = true;
