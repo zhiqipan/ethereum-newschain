@@ -84,11 +84,11 @@ export default class CitationVisualGlobal extends Component {
           <>
             <div style={{ marginBottom: 10 }}>
               <AddressLabel color='brown' icon='ethereum' name='Original' basic address={hoverFrom} />&nbsp;&nbsp;
-              <b>{articleMap[hoverFrom].title}</b>
+              <b>{articleMap[hoverFrom].swarmContent && articleMap[hoverFrom].swarmContent.title}</b>
             </div>
             <div>
               <AddressLabel color='orange' icon='ethereum' name='Derived' basic address={hoverTo} />&nbsp;&nbsp;
-              <b>{articleMap[hoverTo].title}</b>
+              <b>{articleMap[hoverTo].swarmContent && articleMap[hoverTo].swarmContent.title}</b>
             </div>
           </>
           }
@@ -140,7 +140,7 @@ export default class CitationVisualGlobal extends Component {
                     overflow: 'hidden',
                     marginLeft: 5,
                     width: 'calc(100% - 150px)',
-                  }}>{article.title}</span>
+                  }}>{article.swarmContent && article.swarmContent.title}</span>
                   <div style={{ color: 'gray', overflow: 'hidden', whiteSpace: 'nowrap', marginRight: 10, marginTop: 5 }}>
                     <p style={{
                       fontSize: 13,
@@ -148,7 +148,7 @@ export default class CitationVisualGlobal extends Component {
                       height: 13,
                       textOverflow: 'ellipsis',
                       overflow: 'hidden',
-                    }}>{h2p(article.body)}</p>
+                    }}>{h2p(article.swarmContent && article.swarmContent.body)}</p>
                   </div>
                 </div>
               );
