@@ -91,7 +91,7 @@ export default class RewardTokenForm extends Component {
     const article = getArticle(this.props.address);
     const account = (await web3.eth.getAccounts())[0];
     await article.methods
-      .rewardToken(this.state.transferFrom, this.state.tokenAddress, this.state.tokenAmount)
+      .rewardToken(this.state.tokenAddress, this.state.transferFrom, this.state.tokenAmount)
       .send({ from: account });
   };
 
