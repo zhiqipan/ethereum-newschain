@@ -55,7 +55,14 @@ export default class CitationVisualGlobal extends Component {
         <h2>Citation relationship</h2>
         <FlexibleSankey
           height={300}
-          nodes={nodes}
+          nodes={nodes.map(node => {
+            const a = this.state.articleMap[node.address];
+            if (a && a.swarmContent && a.swarmContent.title) {
+              return { ...node, name: a.swarmContent.title.substr(0, 10) };
+            } else {
+              return node;
+            }
+          })}
           links={links.map((d, i) => {
             let opacity = LINK_OPACITY;
             if (hoverLink && i === hoverLink.index) opacity = HOVER_LINK_OPACITY;
