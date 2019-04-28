@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { makeWidthFlexible, Sankey } from 'react-vis';
 import { Button, Card, Radio, Segment } from 'semantic-ui-react';
 import h2p from 'html2plaintext';
+import * as idb from 'idb';
 import { loadDataGlobal, recomputeGlobal } from '../../visual/dataProcessor';
 import loadArticleDetail from '../../utils/loadArticleDetail';
 import { loadArticleDetail as __loadFakeDetail } from '../../visual/fixtures';
@@ -31,6 +32,22 @@ export default class CitationVisualGlobal extends Component {
   };
 
   async componentDidMount() {
+    let db;
+    if (process.browser && window.indexedDB) {
+      db = await idb.openDB('NewsChain', 1, {
+        upgrade(db) {
+          // Create a store of objects
+          const store = db.createObjectStore('articles', {
+            keyPath: 'address',
+          });
+          store.createIndex('address', 'address');
+        },
+      });
+      const articles = await db.getAllFromIndex('articles', 'address');
+      this.setState({ Articles: articles });
+    }
+
+    // update and renew IndexedDB cache
     const { nodes, links, articleMap, isolated } = await loadDataGlobal();
     this.setState({ nodes, links, articleMap, isolated }, () => {
       Object.keys(articleMap).forEach(async address => { // lazy load
@@ -38,6 +55,9 @@ export default class CitationVisualGlobal extends Component {
         const articleDetail = await (MOCK ? __loadFakeDetail() : loadArticleDetail(address));
         this.setState(state => {
           state.articleMap[address] = { ...state.articleMap[address], ...articleDetail };
+          if (db) { // renew db
+            db.add('articles', { ...state.articleMap[address], ...articleDetail }).then();
+          }
           return { articleMap: { ...state.articleMap } };
         });
       });

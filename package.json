@@ -14,10 +14,12 @@
   },
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
+    "axios": "latest",
     "braft-editor": "^2.2.9",
     "fs-extra": "^7.0.1",
     "ganache-cli": "^6.1.8",
     "html2plaintext": "^2.1.2",
+    "idb": "^4.0.3",
     "moment": "^2.24.0",
     "next": "^8.1.0",
     "next-routes": "^1.4.2",
@@ -27,8 +29,7 @@
     "semantic-ui-react": "^0.86.0",
     "solc": "0.5.7",
     "truffle-hdwallet-provider": "0.0.6",
-    "web3": "1.0.0-beta.34",
-    "axios": "latest"
+    "web3": "1.0.0-beta.34"
   },
   "engines": {
     "node": "10.13.0"
